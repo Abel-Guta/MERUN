@@ -1,32 +1,92 @@
-# React + TypeScript + Vite
+# MERUN
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+A simple, accessible run-logging application for runners who want to record
+their runs and see them in a social feed.
 
-Currently, two official plugins are available:
+## Overview
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+MERUN lets runners log their runs and follow what others are running. Each run
+is presented as a card that shows who ran, when and where, and the key
+numbers: distance, time and pace.
 
-## React Compiler
+The project is an early MVP. It is built to be accessible to keyboard and
+screen-reader users from the start, and to handle unexpected data gracefully
+rather than fail.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### Current status
 
-## Expanding the Oxlint configuration
+| Area | State |
+|---|---|
+| Run feed with run cards | Available, using mock data |
+| Logging a new run | Planned |
+| Backend, authentication, persistence | Not started |
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
+### Features
 
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+- Feed of runs with user details, location, notes and run statistics
+- Pace calculated from distance and time
+- Screen-reader-friendly output, such as "5 minutes 24 seconds per kilometer"
+  in place of `5:24 /km`
+- Skip link, landmarks and visible keyboard focus
+- Safe fallbacks for missing or invalid run data
+
+## Stack
+
+React 19, TypeScript (strict), Vite, plain CSS, oxlint.
+
+## Getting started
+
+Requires Node.js and npm.
+
+```bash
+npm install
+npm run dev
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+The dev server prints the local URL.
+
+| Command | What it does |
+|---|---|
+| `npm run dev` | Start the dev server with hot reload |
+| `npm run build` | Type-check and build for production |
+| `npm run lint` | Run oxlint, including accessibility rules |
+| `npm run preview` | Serve the production build locally |
+
+There is no test runner yet.
+
+## Project structure
+
+```
+src/
+  App.tsx            page shell: skip link, header, main
+  components/        Feed and FeedCard, each with its own .css
+  data/runs.json     mock runs and users
+  lib/format.ts      formatting helpers for display and screen readers
+  types/run.ts       User and Run types
+  index.css          global styles and CSS variables
+docs/                architecture, accessibility, changelog
+```
+
+## Principles
+
+- **Accessible from the start.** Semantic HTML, labels and ARIA, with
+  `jsx-a11y` lint rules enforced. See [docs/ACCESSIBILITY.md](docs/ACCESSIBILITY.md).
+- **Defensive by default.** Helper functions do not assume their input was
+  validated; bad data produces a safe fallback, never a crash or `NaN`.
+- **Small stack.** Plain CSS, no UI library.
+
+## Documentation
+
+- [AGENTS.md](AGENTS.md): rules, conventions and commands for AI agents and
+  contributors. Start here if you are about to change code.
+- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md): data flow, components and the
+  formatting helper contract.
+- [docs/ACCESSIBILITY.md](docs/ACCESSIBILITY.md): checklist for UI changes.
+- [docs/CHANGELOG.md](docs/CHANGELOG.md): what changed, where and why.
+
+## Roadmap
+
+- Form to log a new run
+- Persistence (local storage first)
+- Runtime validation of incoming data
+- Tests for the formatting helpers
