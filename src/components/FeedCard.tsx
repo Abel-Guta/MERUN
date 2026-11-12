@@ -5,6 +5,7 @@ import {
   durationLabel,
   formatDate,
   formatDateLong,
+  formatDistance,
   formatDuration,
   formatPace,
   paceLabel,
@@ -47,7 +48,7 @@ export function FeedCard({ run }: { run: Run }) {
       <dl className="feed-card__stats" aria-label="Run statistics">
         <div>
           <dt>Distance</dt>
-          <dd aria-label={distanceLabel(run.distanceKm)}>{run.distanceKm.toFixed(1)} km</dd>
+          <dd aria-label={distanceLabel(run.distanceKm)}>{formatDistance(run.distanceKm)}</dd>
         </div>
         <div>
           <dt>Time</dt>
