@@ -6,10 +6,17 @@ const runs = runsData as Run[]
 
 function App() {
   return (
-    <main className="app">
-      <h1 className="app__title">MERUN</h1>
-      <Feed runs={runs} />
-    </main>
+    <>
+      <a className="skip-link" href="#main">
+        Skip to main content
+      </a>
+      <header className="app__header">
+        <h1 className="app__title">MERUN</h1>
+      </header>
+      <main id="main" className="app" tabIndex={-1}>
+        <Feed runs={runs} />
+      </main>
+    </>
   )
 }
 

@@ -1,36 +1,63 @@
+import { useId } from 'react'
 import type { Run } from '../types/run'
-import { formatDate, formatDuration, formatPace } from '../lib/format'
+import {
+  distanceLabel,
+  durationLabel,
+  formatDate,
+  formatDateLong,
+  formatDuration,
+  formatPace,
+  paceLabel,
+} from '../lib/format'
 import './FeedCard.css'
 
 export function FeedCard({ run }: { run: Run }) {
+  const titleId = useId()
   const { user } = run
+
   return (
-    <article className="feed-card">
+    <article className="feed-card" aria-labelledby={titleId}>
       <header className="feed-card__header">
+        {/* Decorative: the name is rendered as text right next to it */}
         <img className="feed-card__avatar" src={user.avatarUrl} alt="" width={40} height={40} />
         <div>
-          <div className="feed-card__name">{user.name}</div>
-          <div className="feed-card__meta">
-            @{user.username} · {formatDate(run.date)} · {run.location}
-          </div>
+          <p className="feed-card__name">
+            {user.name} <span className="visually-hidden">ran</span>
+          </p>
+          <p className="feed-card__meta">
+            <span aria-label={`Username ${user.username}`}>@{user.username}</span>
+            <span aria-hidden="true"> · </span>
+            <time dateTime={run.date} aria-label={formatDateLong(run.date)}>
+              {formatDate(run.date)}
+            </time>
+            <span aria-hidden="true"> · </span>
+            <span>
+              <span className="visually-hidden">Location: </span>
+              {run.location}
+            </span>
+          </p>
         </div>
       </header>
 
-      <h2 className="feed-card__title">{run.title}</h2>
+      <h3 className="feed-card__title" id={titleId}>
+        {run.title}
+      </h3>
       {run.notes && <p className="feed-card__notes">{run.notes}</p>}
 
-      <dl className="feed-card__stats">
+      <dl className="feed-card__stats" aria-label="Run statistics">
         <div>
           <dt>Distance</dt>
-          <dd>{run.distanceKm.toFixed(1)} km</dd>
+          <dd aria-label={distanceLabel(run.distanceKm)}>{run.distanceKm.toFixed(1)} km</dd>
         </div>
         <div>
           <dt>Time</dt>
-          <dd>{formatDuration(run.durationSec)}</dd>
+          <dd aria-label={durationLabel(run.durationSec)}>{formatDuration(run.durationSec)}</dd>
         </div>
         <div>
           <dt>Pace</dt>
-          <dd>{formatPace(run.distanceKm, run.durationSec)}</dd>
+          <dd aria-label={paceLabel(run.distanceKm, run.durationSec)}>
+            {formatPace(run.distanceKm, run.durationSec)}
+          </dd>
         </div>
       </dl>
     </article>

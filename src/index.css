@@ -1,25 +1,95 @@
+:root {
+  --color-bg: #f5f6f8;
+  --color-surface: #fff;
+  --color-text: #111827;
+  --color-text-muted: #4b5563; /* >= 4.5:1 on bg and surface */
+  --color-border: #d1d5db;
+  --color-focus: #1d4ed8;
+}
+
 *,
 *::before,
 *::after {
   box-sizing: border-box;
 }
 
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
 body {
   margin: 0;
   font-family: system-ui, sans-serif;
+  line-height: 1.5;
+  background: var(--color-bg);
+  color: var(--color-text);
 }
 
-body {
-  background: #f5f6f8;
-  color: #111827;
+/* Visible keyboard focus everywhere */
+:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 2px;
 }
 
+/* main is focused programmatically by the skip link; no ring needed */
+main:focus {
+  outline: none;
+}
+
+/* Text for screen readers only */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip-link {
+  position: absolute;
+  left: 8px;
+  top: -100px;
+  z-index: 10;
+  padding: 8px 16px;
+  background: var(--color-surface);
+  color: var(--color-text);
+  border: 2px solid var(--color-focus);
+  border-radius: 6px;
+}
+
+.skip-link:focus {
+  top: 8px;
+}
+
+.app__header,
 .app {
   max-width: 560px;
   margin: 0 auto;
-  padding: 24px 16px;
+  padding: 0 16px;
+}
+
+.app__header {
+  padding-top: 24px;
+}
+
+.app {
+  padding-bottom: 24px;
 }
 
 .app__title {
   margin: 0 0 20px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

@@ -1,15 +1,28 @@
+import { useId } from 'react'
 import type { Run } from '../types/run'
 import { FeedCard } from './FeedCard'
 import './Feed.css'
 
 export function Feed({ runs }: { runs: Run[] }) {
-  if (runs.length === 0) return <p className="feed__empty">No runs yet.</p>
+  const headingId = useId()
 
   return (
-    <section className="feed">
-      {runs.map((run) => (
-        <FeedCard key={run.id} run={run} />
-      ))}
+    <section className="feed" aria-labelledby={headingId}>
+      <h2 id={headingId} className="feed__heading">
+        Recent runs
+      </h2>
+
+      {runs.length === 0 ? (
+        <output className="feed__empty">No runs yet.</output>
+      ) : (
+        <ul className="feed__list">
+          {runs.map((run) => (
+            <li key={run.id}>
+              <FeedCard run={run} />
+            </li>
+          ))}
+        </ul>
+      )}
     </section>
   )
 }
