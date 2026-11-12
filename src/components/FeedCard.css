@@ -1,0 +1,56 @@
+.feed-card {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.feed-card__header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.feed-card__avatar {
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.feed-card__name {
+  font-weight: 600;
+}
+
+.feed-card__meta {
+  font-size: 0.8rem;
+  color: #6b7280;
+}
+
+.feed-card__title {
+  margin: 14px 0 4px;
+  font-size: 1.15rem;
+}
+
+.feed-card__notes {
+  margin: 0 0 4px;
+  color: #374151;
+}
+
+.feed-card__stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin: 14px 0 0;
+  padding-top: 12px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.feed-card__stats dt {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.feed-card__stats dd {
+  margin: 2px 0 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+}

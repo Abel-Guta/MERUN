@@ -1,0 +1,10 @@
+.feed {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.feed__empty {
+  text-align: center;
+  color: #6b7280;
+}
