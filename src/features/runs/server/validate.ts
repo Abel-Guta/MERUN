@@ -7,7 +7,7 @@ export type Parsed<T> = { ok: true; value: T } | { ok: false; fields: FieldError
 export const DEFAULT_LIMIT = 20
 export const MAX_LIMIT = 50
 
-// Same upper bounds as the display helpers in format.ts, so anything the
+// Same upper bounds as the display helpers in lib/format.ts, so anything the
 // API accepts can also be rendered.
 const MAX_DISTANCE_KM = 100_000
 const MAX_DURATION_SEC = 365 * 24 * 60 * 60

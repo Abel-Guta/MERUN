@@ -8,7 +8,7 @@ src/features/runs/seed.json (via mock-runs.ts)
         ▼
  app/page.tsx ──► Feed (runs) ──► FeedCard (run) × N
                                    │
-                                   └─ features/runs/format.ts (display + spoken text)
+                                   └─ features/runs/lib/format.ts (display + spoken text)
 ```
 
 Data moves one way, from the page down through props. There is no shared state
@@ -35,7 +35,8 @@ more features need.
 
 ```
 src/app/                routing only (pages, layout, one-line route files)
-src/features/<name>/    index.ts (client-safe), server/index.ts (server only)
+src/features/<name>/    index.ts (client-safe), server/index.ts (server only),
+                        lib/ (pure helpers), components/, types.ts
 src/shared/             never imports features/ or app/
 ```
 
@@ -106,7 +107,7 @@ seconds. Pace is never stored; it is derived from the two.
 Cards use `<h3>` because the page outline is `h1` (app) → `h2` (feed) → `h3`
 (run). Keep that nesting if you add sections.
 
-## Formatting helpers (`src/features/runs/format.ts`)
+## Formatting helpers (`src/features/runs/lib/format.ts`)
 
 Pure functions. Each metric has a visual form and a spoken form:
 

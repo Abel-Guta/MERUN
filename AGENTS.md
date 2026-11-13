@@ -6,8 +6,9 @@ follow the links for detail.
 ## Project
 
 MERUN is a run-logging MVP. Current scope: a feed of run cards (who ran, what
-they ran) rendered from mock JSON. There is one route (`/`) and no API routes,
-auth or persistence yet.
+they ran) rendered from mock JSON. There is one page (`/`) and a runs API
+under `/api` (in-memory storage, not wired to the feed yet). There is no auth or
+persistence yet.
 
 Stack: Next.js 16 (App Router), React 19, TypeScript, plain CSS, oxlint. No UI
 library, no test runner.
@@ -44,7 +45,8 @@ src/
     runs/                    one folder per feature
       index.ts               public, client-safe surface
       components/            Feed, FeedCard (each with a co-located .css file)
-      format.ts              pure formatting helpers (visual + screen-reader text)
+      lib/                   pure helpers, no server APIs
+        format.ts            formatting helpers (visual + screen-reader text)
       types.ts               User and Run types
       mock-runs.ts, seed.json  mock data
       server/                server-only code
@@ -57,7 +59,9 @@ docs/                        see below
 
 Feature structure: a feature owns its UI, types, server logic and data. Create a
 new folder under `features/` when a new feature starts; do not add empty ones.
-Move code to `shared/` only when a second feature needs it.
+Pure helper modules (formatters, parsers, calculations) go in the feature's
+`lib/` folder. Server-only code goes in `server/`. Move code to `shared/` only
+when a second feature needs it.
 
 ## Documentation map
 
@@ -78,7 +82,7 @@ These are decisions the owner has made. Do not reverse them without asking.
 2. **Functions do not trust their input.** Validating before the call is
    planned, but every function must still behave correctly when handed bad
    data: no throws on garbage, no `NaN`/`Infinity`/`Invalid Date` in output.
-   Take `unknown` at boundaries and narrow it. See `src/features/runs/format.ts`.
+   Take `unknown` at boundaries and narrow it. See `src/features/runs/lib/format.ts`.
 3. **Plain CSS, co-located.** One `.css` file per component, imported by that
    component. Colors come from the CSS variables in `src/app/globals.css`. Do not add
    a CSS framework or UI library without asking.
@@ -114,7 +118,7 @@ These are decisions the owner has made. Do not reverse them without asking.
 
 Tracked here so nobody has to rediscover them.
 
-- No tests. The behaviour of `src/features/runs/format.ts` is specified in
+- No tests. The behaviour of `src/features/runs/lib/format.ts` is specified in
   [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) and is the first candidate for
   Vitest coverage.
 - `src/features/runs/mock-runs.ts` casts the JSON with `as Run[]`, which is a type assertion and

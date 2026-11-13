@@ -242,3 +242,16 @@ Entry format: **What** (the change), **Where** (files), **Why** (the reason).
   imports. A deliberate client import of `store.ts` failed the build through
   `server-only`. After the move, every API endpoint and the home page responded
   as before.
+
+## 13. Feature `lib/` folder convention
+
+- **What:** Pure helper modules live in `features/<name>/lib/`. `format.ts`
+  moved there. No behaviour change.
+- **Where:** `src/features/runs/format.ts` to `src/features/runs/lib/format.ts`;
+  the import in `components/FeedCard.tsx`; a comment in
+  `server/validate.ts`; `AGENTS.md` (layout and feature structure note),
+  `docs/ARCHITECTURE.md`, `docs/ACCESSIBILITY.md`.
+- **Why:** The owner wants one predictable place for helpers in every feature,
+  so reviewers and agents know where to look. Types, mock data, components and
+  server code keep their own places.
+- **Verified:** `npm run build` and `npm run lint` pass.

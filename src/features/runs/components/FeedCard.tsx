@@ -9,7 +9,7 @@ import {
   formatDuration,
   formatPace,
   paceLabel,
-} from '../format'
+} from '../lib/format'
 import './FeedCard.css'
 
 export function FeedCard({ run }: { run: Run }) {
