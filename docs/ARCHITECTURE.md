@@ -27,6 +27,32 @@ yet. `app/layout.tsx` wraps every route with the skip link, header and `<main>`.
 - The API will live in this project as Route Handlers. Keep server logic in
   plain modules (not inside the handlers) so it can be extracted later.
 
+## API (`src/app/api`)
+
+Route Handlers are thin. Validation and storage live in `src/lib/server/`
+(`validate.ts`, `runs.ts`, `http.ts`) so the backend can be extracted later.
+Handlers are not cached.
+
+| Method and path | Result |
+|---|---|
+| `GET /api/runs?limit=20&cursor=<id>` | `200 { items: Run[], nextCursor: string \| null }`, newest first |
+| `GET /api/runs/:id` | `200 Run`, or `404` |
+| `POST /api/runs` | `201 Run` with a `Location` header, or `400`/`422` |
+| `GET /api/users/:username/runs?limit&cursor` | Same shape as the list, or `404` for an unknown user |
+
+- `limit` is 1 to 50 (default 20). The cursor is the id of the last item on the
+  previous page.
+- `POST` body: `title`, `location`, `distanceKm` (> 0), `durationSec` (whole
+  number > 0), `date` (ISO 8601, not in the future), optional `notes`. Text is
+  trimmed; unknown fields are ignored; the server sets `id` and `user`.
+- Errors share one shape: `{ error: { code, message, fields? } }`. `fields`
+  maps input names to messages. Codes: `invalid_json` (400), `invalid_query`
+  (400), `invalid_cursor` (400), `validation_failed` (422), `not_found` (404).
+- Storage is an in-memory array seeded from `runs.json`. It resets when the
+  server restarts and is not shared between serverless instances, so created
+  runs are not durable yet.
+- There is no auth. Created runs belong to the first seeded user.
+
 ## Types (`src/types/run.ts`)
 
 ```ts

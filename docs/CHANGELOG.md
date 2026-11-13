@@ -176,3 +176,30 @@ Entry format: **What** (the change), **Where** (files), **Why** (the reason).
   `index.css` and the split tsconfigs, which no longer exist. The rendering
   decisions (public pages static or server-rendered, client-rendered feed, API
   in the same project) are the owner's and belong where agents read the rules.
+
+## 11. Runs API (v1)
+
+- **What:** REST endpoints to list, read and create runs, with server-side
+  validation and cursor pagination. The feed does not use them yet.
+- **Where:**
+  - `src/app/api/runs/route.ts`: `GET` (list) and `POST` (create).
+  - `src/app/api/runs/[id]/route.ts`: `GET` one run.
+  - `src/app/api/users/[username]/runs/route.ts`: `GET` a user's runs.
+  - `src/lib/server/validate.ts`: `parseNewRun` and `parseLimit`. Take
+    `unknown` and return field errors instead of throwing.
+  - `src/lib/server/runs.ts`: in-memory store seeded from `runs.json`.
+  - `src/lib/server/http.ts`: the shared error response and list handler.
+  - `docs/ARCHITECTURE.md`: new API section with the contract.
+- **Why:** The feed needs a data source and the log-a-run form needs
+  somewhere to post. Handlers stay thin and the logic sits in plain modules so
+  the backend can be split out later. Bounds match the display helpers so any
+  accepted run can be rendered. Errors have one shape, with per-field
+  messages, so the form can show them next to inputs. The store is in memory
+  as a stand-in for a database.
+- **Verified:** `npm run build` and `npm run lint` pass. Against a production
+  server: pagination across two pages, bad `limit` and `cursor`, 404s, a valid
+  `POST` (201, trimmed, date normalized to UTC, newest-first in the list), and
+  invalid bodies (malformed JSON, wrong types, arrays, out-of-range numbers,
+  future date).
+- **Limits:** No automated tests (there is no test runner). Created runs are
+  lost on restart. No auth, rate limiting or request size limit.
