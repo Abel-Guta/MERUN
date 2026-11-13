@@ -130,3 +130,32 @@ Entry format: **What** (the change), **Where** (files), **Why** (the reason).
   exists today and marks logging, backend, auth and persistence as planned or
   not started, so the README does not promise features the code lacks. It is
   committed together with the docs.
+
+## 9. Migrate from Vite to Next.js (App Router)
+
+- **What:** Replaced the Vite toolchain with Next.js 16 (App Router). UI and
+  behaviour are unchanged.
+- **Where:**
+  - `package.json`, `package-lock.json`: added `next`, removed `vite` and
+    `@vitejs/plugin-react`. Scripts are `next dev`, `next build`, `next start`.
+  - `src/app/layout.tsx` (new): `<html lang="en">`, skip link, header,
+    `<main id="main" tabIndex={-1}>`, page title and favicon. Holds what
+    `index.html` and `App.tsx` held.
+  - `src/app/page.tsx` (new): loads the mock JSON and renders `<Feed>`.
+  - `src/app/globals.css`: moved from `src/index.css`, contents unchanged.
+  - `src/components/Feed.tsx`: marked `'use client'`.
+  - `next.config.ts` (new): empty for now.
+  - `tsconfig.json`: now a single Next-style config. Strict mode and the extra
+    checks are kept. Replaces `tsconfig.app.json` and `tsconfig.node.json`.
+  - `.oxlintrc.json`: `react/only-export-components` is off for `src/app/**`.
+  - `.gitignore`: ignores `.next`, `out`, `next-env.d.ts`.
+  - Removed `index.html`, `vite.config.ts`, `src/main.tsx`, `src/App.tsx`.
+- **Why:** The owner plans public pages (server-rendered or static) next to a
+  client-rendered, personalized home feed, with the API and front end in one
+  deployable project. `Feed` is a client component because it will own the
+  browser-side data fetching. The lint override exists because Next requires
+  `layout.tsx` to export `metadata`, which the Fast Refresh rule flags falsely.
+- **Verified:** `npm run build` and `npm run lint` pass with no warnings. The
+  dev server renders the skip link, `<main>`, heading and cards.
+- **Not done:** `AGENTS.md` and `docs/ARCHITECTURE.md` still describe Vite and
+  are updated in a later step.
