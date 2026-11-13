@@ -32,7 +32,7 @@ rather than fail.
 
 ## Stack
 
-React 19, TypeScript (strict), Vite, plain CSS, oxlint.
+Next.js 16 (App Router), React 19, TypeScript (strict), plain CSS, oxlint.
 
 ## Getting started
 
@@ -50,7 +50,7 @@ The dev server prints the local URL.
 | `npm run dev` | Start the dev server with hot reload |
 | `npm run build` | Type-check and build for production |
 | `npm run lint` | Run oxlint, including accessibility rules |
-| `npm run preview` | Serve the production build locally |
+| `npm run preview` | Serve the production build locally (run `build` first) |
 
 There is no test runner yet.
 
@@ -58,12 +58,11 @@ There is no test runner yet.
 
 ```
 src/
-  App.tsx            page shell: skip link, header, main
+  app/               layout (skip link, header, main), home page, global CSS
   components/        Feed and FeedCard, each with its own .css
   data/runs.json     mock runs and users
   lib/format.ts      formatting helpers for display and screen readers
   types/run.ts       User and Run types
-  index.css          global styles and CSS variables
 docs/                architecture, accessibility, changelog
 ```
 

@@ -159,3 +159,20 @@ Entry format: **What** (the change), **Where** (files), **Why** (the reason).
   dev server renders the skip link, `<main>`, heading and cards.
 - **Not done:** `AGENTS.md` and `docs/ARCHITECTURE.md` still describe Vite and
   are updated in a later step.
+
+## 10. Docs updated for the Next.js stack
+
+- **What:** Replaced Vite-era descriptions with the Next.js App Router setup and
+  recorded the rendering strategy.
+- **Where:**
+  - `AGENTS.md`: stack line, project scope, rendering strategy, commands,
+    layout tree, strict-mode config path, CSS path, known-gap path.
+  - `docs/ARCHITECTURE.md`: data flow starts at `app/page.tsx`, new Rendering
+    section, component table lists `RootLayout`, `HomePage` and `Feed`,
+    styling and tooling paths, lint override note.
+  - `docs/ACCESSIBILITY.md`: global CSS path.
+  - `README.md`: stack, `preview` note, project structure.
+- **Why:** The docs still pointed at `vite`, `App.tsx`, `main.tsx`,
+  `index.css` and the split tsconfigs, which no longer exist. The rendering
+  decisions (public pages static or server-rendered, client-rendered feed, API
+  in the same project) are the owner's and belong where agents read the rules.

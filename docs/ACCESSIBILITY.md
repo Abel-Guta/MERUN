@@ -34,7 +34,7 @@ as a checklist for every UI change.
 
 **Keyboard and focus**
 - A skip link is the first focusable element and targets `#main`.
-- Do not remove outlines. `:focus-visible` in `src/index.css` provides a 3px
+- Do not remove outlines. `:focus-visible` in `src/app/globals.css` provides a 3px
   ring; do not override it per component without a replacement.
 - Do not put click handlers on non-interactive elements. Use `<button>` for
   actions and `<a href>` for navigation (the lint rules enforce this).
