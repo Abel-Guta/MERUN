@@ -17,6 +17,7 @@
     "isolatedModules": true,
     "verbatimModuleSyntax": true,
     "moduleDetection": "force",
+    "paths": { "@/*": ["./src/*"] },
     "plugins": [
       {
         "name": "next"

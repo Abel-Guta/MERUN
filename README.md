@@ -59,10 +59,9 @@ There is no test runner yet.
 ```
 src/
   app/               layout (skip link, header, main), home page, global CSS
-  components/        Feed and FeedCard, each with its own .css
-  data/runs.json     mock runs and users
-  lib/format.ts      formatting helpers for display and screen readers
-  types/run.ts       User and Run types
+  features/runs/     the runs feature: components, formatting helpers, types,
+                     mock data and server code (API handlers, validation, store)
+  shared/            code shared by several features (HTTP helpers)
 docs/                architecture, accessibility, changelog
 ```
 

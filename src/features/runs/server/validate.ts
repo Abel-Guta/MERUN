@@ -1,13 +1,13 @@
-import type { Run } from '../../types/run'
+import type { FieldErrors } from '@/shared/server/http'
+import type { Run } from '../types'
 
 export type NewRun = Omit<Run, 'id' | 'user'>
-export type FieldErrors = Record<string, string>
 export type Parsed<T> = { ok: true; value: T } | { ok: false; fields: FieldErrors }
 
 export const DEFAULT_LIMIT = 20
 export const MAX_LIMIT = 50
 
-// Same upper bounds as the display helpers in lib/format.ts, so anything the
+// Same upper bounds as the display helpers in format.ts, so anything the
 // API accepts can also be rendered.
 const MAX_DISTANCE_KM = 100_000
 const MAX_DURATION_SEC = 365 * 24 * 60 * 60

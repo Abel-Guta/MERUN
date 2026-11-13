@@ -1,9 +1,5 @@
-import { Feed } from '../components/Feed'
-import runsData from '../data/runs.json'
-import type { Run } from '../types/run'
-
-const runs = runsData as Run[]
+import { Feed, mockRuns } from '@/features/runs'
 
 export default function HomePage() {
-  return <Feed runs={runs} />
+  return <Feed runs={mockRuns} />
 }

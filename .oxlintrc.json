@@ -9,6 +9,74 @@
     {
       "files": ["src/app/**"],
       "rules": { "react/only-export-components": "off" }
+    },
+    {
+      "files": ["src/app/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": ["@/features/*/*", "!@/features/*/server", "@/features/*/*/**"],
+                "message": "Import a feature through its entry points only: '@/features/<name>' or '@/features/<name>/server'."
+              },
+              {
+                "group": ["../**"],
+                "message": "Use the '@/' alias for anything outside this folder."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["src/shared/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": ["@/features", "@/features/**", "@/app/**"],
+                "message": "shared/ must not depend on features/ or app/."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["src/features/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": ["@/features", "@/features/**", "@/app/**"],
+                "message": "Features must not import other features or app/. Use relative imports inside a feature; move shared code to shared/."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["src/features/*/components/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "patterns": [
+              {
+                "group": ["@/features", "@/features/**", "@/app/**", "**/server", "**/server/**"],
+                "message": "Components must not import server code (or other features)."
+              }
+            ]
+          }
+        ]
+      }
     }
   ]
 }

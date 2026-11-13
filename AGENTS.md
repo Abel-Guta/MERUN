@@ -35,16 +35,29 @@ with no warnings. TypeScript runs in strict mode (`"strict": true` in
 
 ```
 src/
-  app/
-    layout.tsx         root shell: skip link, header, <main>, metadata
-    page.tsx           home route: loads the mock data, renders <Feed>
-    globals.css        global styles, CSS variables, utilities
-  components/          Feed, FeedCard (each with a co-located .css file)
-  data/runs.json       mock data
-  lib/format.ts        pure formatting helpers (visual + screen-reader text)
-  types/run.ts         User and Run types
-docs/                  see below
+  app/                       routing only; no logic
+    layout.tsx               root shell: skip link, header, <main>, metadata
+    page.tsx                 home route: renders <Feed>
+    globals.css              global styles, CSS variables, utilities
+    api/                     one-line route files that re-export feature handlers
+  features/
+    runs/                    one folder per feature
+      index.ts               public, client-safe surface
+      components/            Feed, FeedCard (each with a co-located .css file)
+      format.ts              pure formatting helpers (visual + screen-reader text)
+      types.ts               User and Run types
+      mock-runs.ts, seed.json  mock data
+      server/                server-only code
+        index.ts             public server surface (route handlers)
+        handlers.ts, store.ts, validate.ts
+  shared/                    code used by two or more features
+    server/http.ts           error response helper
+docs/                        see below
 ```
+
+Feature structure: a feature owns its UI, types, server logic and data. Create a
+new folder under `features/` when a new feature starts; do not add empty ones.
+Move code to `shared/` only when a second feature needs it.
 
 ## Documentation map
 
@@ -65,19 +78,29 @@ These are decisions the owner has made. Do not reverse them without asking.
 2. **Functions do not trust their input.** Validating before the call is
    planned, but every function must still behave correctly when handed bad
    data: no throws on garbage, no `NaN`/`Infinity`/`Invalid Date` in output.
-   Take `unknown` at boundaries and narrow it. See `src/lib/format.ts`.
+   Take `unknown` at boundaries and narrow it. See `src/features/runs/format.ts`.
 3. **Plain CSS, co-located.** One `.css` file per component, imported by that
    component. Colors come from the CSS variables in `src/app/globals.css`. Do not add
    a CSS framework or UI library without asking.
 4. **Explain every change.** When you finish a piece of work, report what you
    did, which files changed, and why.
+5. **Feature boundaries are enforced.** Import a feature only through
+   `@/features/<name>` (client-safe) or `@/features/<name>/server` (server
+   only). Features never import other features or `app/`; `shared/` never
+   imports features or `app/`; components never import server code. Server
+   modules start with `import 'server-only'`. `npm run lint` enforces the
+   import rules (see `.oxlintrc.json`) and the build enforces `server-only`.
+   Do not weaken or bypass them without asking.
 
 ## Conventions
 
 - Components are function components with named exports (`App` is the default
   export). Props are typed inline or with a local interface.
 - Use `useId` for generated element ids (label/heading association).
-- Imports are relative. There is no path alias.
+- Use the `@/` alias (maps to `src/`) for imports that cross a top-level folder
+  (`app`, `features`, `shared`). Inside a feature, use relative imports; features
+  cannot import themselves through the alias.
+- `app/` route files are one-line re-exports. Put logic in the feature.
 - Files use 2-space indentation, single quotes and no semicolons, matching the
   existing code.
 - Comments explain why, not what. Do not narrate the code, add section banners
@@ -91,10 +114,10 @@ These are decisions the owner has made. Do not reverse them without asking.
 
 Tracked here so nobody has to rediscover them.
 
-- No tests. The behaviour of `src/lib/format.ts` is specified in
+- No tests. The behaviour of `src/features/runs/format.ts` is specified in
   [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) and is the first candidate for
   Vitest coverage.
-- `src/app/page.tsx` casts the JSON with `as Run[]`, which is a type assertion and
+- `src/features/runs/mock-runs.ts` casts the JSON with `as Run[]`, which is a type assertion and
   not a runtime check. Replace it with a validator at the data boundary when a
   real data source arrives.
 - User avatars load from a remote host (`i.pravatar.cc`).

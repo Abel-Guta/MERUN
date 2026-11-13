@@ -3,12 +3,12 @@
 ## Data flow
 
 ```
-src/data/runs.json
+src/features/runs/seed.json (via mock-runs.ts)
         │  imported, asserted as Run[]
         ▼
  app/page.tsx ──► Feed (runs) ──► FeedCard (run) × N
                                    │
-                                   └─ src/lib/format.ts (display + spoken text)
+                                   └─ features/runs/format.ts (display + spoken text)
 ```
 
 Data moves one way, from the page down through props. There is no shared state
@@ -27,11 +27,41 @@ yet. `app/layout.tsx` wraps every route with the skip link, header and `<main>`.
 - The API will live in this project as Route Handlers. Keep server logic in
   plain modules (not inside the handlers) so it can be extracted later.
 
+## Code organization
+
+Feature-based modular monolith. A feature owns its UI, types, server logic and
+data; `app/` only wires routes to features; `shared/` holds code that two or
+more features need.
+
+```
+src/app/                routing only (pages, layout, one-line route files)
+src/features/<name>/    index.ts (client-safe), server/index.ts (server only)
+src/shared/             never imports features/ or app/
+```
+
+Rules (enforced by `no-restricted-imports` in `.oxlintrc.json`, and by
+`server-only` at build time):
+
+- Other code imports a feature only through `@/features/<name>` or
+  `@/features/<name>/server`, never deeper paths.
+- Features do not import other features or `app/`. Inside a feature, use
+  relative imports.
+- `shared/` does not import features or `app/`.
+- Components do not import server code. Server modules start with
+  `import 'server-only'`, so a client import fails the build.
+- Imports that cross a top-level folder use the `@/` alias (`src/`).
+
+When a second feature needs something from the first, move it to `shared/`
+rather than importing across features. The lint patterns apply to every feature
+under `src/features/`, so adding a feature needs no config change.
+
 ## API (`src/app/api`)
 
-Route Handlers are thin. Validation and storage live in `src/lib/server/`
-(`validate.ts`, `runs.ts`, `http.ts`) so the backend can be extracted later.
-Handlers are not cached.
+Route files only re-export handlers from `src/features/runs/server`. Handler
+logic, validation and storage live in `features/runs/server/` (`handlers.ts`,
+`validate.ts`, `store.ts`), and `shared/server/http.ts` holds the error
+response helper, so the backend can be extracted later. Handlers are not
+cached.
 
 | Method and path | Result |
 |---|---|
@@ -53,7 +83,7 @@ Handlers are not cached.
   runs are not durable yet.
 - There is no auth. Created runs belong to the first seeded user.
 
-## Types (`src/types/run.ts`)
+## Types (`src/features/runs/types.ts`)
 
 ```ts
 interface User { id; name; username; avatarUrl }
@@ -69,14 +99,14 @@ seconds. Pace is never stored; it is derived from the two.
 | Component | Renders | Notes |
 |---|---|---|
 | `RootLayout` (`app/layout.tsx`) | Skip link, `<header>` with `<h1>`, `<main id="main">` | `main` has `tabIndex={-1}` so the skip link can move focus into it |
-| `HomePage` (`app/page.tsx`) | `<Feed>` | Loads the mock data |
+| `HomePage` (`app/page.tsx`) | `<Feed>` | Passes `mockRuns` from `@/features/runs` until the feed fetches its own data |
 | `Feed` | `<section>` labelled by an `<h2>`, a `<ul>` of cards | Client component. Empty list renders an `<output>` message |
 | `FeedCard` | One `<article>` labelled by its `<h3>` title | Header (avatar, name, username, date, location), notes, stats `<dl>` |
 
 Cards use `<h3>` because the page outline is `h1` (app) → `h2` (feed) → `h3`
 (run). Keep that nesting if you add sections.
 
-## Formatting helpers (`src/lib/format.ts`)
+## Formatting helpers (`src/features/runs/format.ts`)
 
 Pure functions. Each metric has a visual form and a spoken form:
 

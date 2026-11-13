@@ -1,5 +1,6 @@
-import runsData from '../../data/runs.json'
-import type { Run } from '../../types/run'
+import 'server-only'
+import { mockRuns } from '../mock-runs'
+import type { Run } from '../types'
 import type { NewRun } from './validate'
 
 // In-memory store seeded from the mock data. It lives on globalThis so dev-mode
@@ -7,7 +8,7 @@ import type { NewRun } from './validate'
 // restart, so created runs do not persist (or sync across serverless
 // instances) until a database replaces it.
 const globalStore = globalThis as typeof globalThis & { __merunRuns?: Run[] }
-const store = (globalStore.__merunRuns ??= [...(runsData as Run[])])
+const store = (globalStore.__merunRuns ??= [...mockRuns])
 
 // No auth yet, so every created run belongs to the first seeded user.
 const currentUser = store[0].user

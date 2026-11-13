@@ -203,3 +203,42 @@ Entry format: **What** (the change), **Where** (files), **Why** (the reason).
   future date).
 - **Limits:** No automated tests (there is no test runner). Created runs are
   lost on restart. No auth, rate limiting or request size limit.
+
+## 12. Feature-based structure, `@/` alias, enforced boundaries
+
+- **What:** Reorganized `src/` into `app/` (routing only), `features/runs/`
+  and `shared/`, added the `@/` import alias, and enforced the module
+  boundaries with lint and `server-only`. No behaviour change.
+- **Where:**
+  - Moved with `git mv`: `components/*` to `features/runs/components/`,
+    `lib/format.ts` to `features/runs/format.ts`, `types/run.ts` to
+    `features/runs/types.ts`, `data/runs.json` to `features/runs/seed.json`,
+    `lib/server/validate.ts` and `runs.ts` to `features/runs/server/validate.ts`
+    and `store.ts`, `lib/server/http.ts` to `shared/server/http.ts`.
+  - New: `features/runs/index.ts` (client-safe surface),
+    `features/runs/server/index.ts` (server surface),
+    `features/runs/server/handlers.ts` (route handlers and the list helper,
+    moved out of `http.ts`), `features/runs/mock-runs.ts` (the one place that
+    casts the seed to `Run[]`).
+  - `src/app/api/**/route.ts`: now one-line re-exports of the feature handlers.
+    `src/app/page.tsx` imports `Feed` and `mockRuns` from `@/features/runs`.
+  - `tsconfig.json`: `paths` maps `@/*` to `./src/*`.
+  - `.oxlintrc.json`: `no-restricted-imports` overrides for `app`, `shared`,
+    `features` and `features/*/components`.
+  - `package.json`: added `server-only`. Server modules import it.
+  - `AGENTS.md` (layout, new rule 5, import convention, paths),
+    `docs/ARCHITECTURE.md` (new Code organization section, paths),
+    `docs/ACCESSIBILITY.md` and `README.md` (paths).
+- **Why:** The code was getting hard to review for people and agents. A feature
+  folder puts a whole slice (UI, types, server logic, data) in one place, and
+  `app/` stays thin. The boundaries are enforced, not just documented: lint
+  rejects deep imports, cross-feature imports, `shared` depending on features,
+  and components importing server code; `server-only` fails the build if
+  client code reaches the server modules. The alias reverses the earlier
+  "imports are relative" convention at the owner's request, so imports that
+  cross folders do not turn into `../../../` chains.
+- **Verified:** `npm run build` and `npm run lint` pass. Temporary probe files
+  confirmed every lint rule fires on a violation and stays quiet on valid
+  imports. A deliberate client import of `store.ts` failed the build through
+  `server-only`. After the move, every API endpoint and the home page responded
+  as before.

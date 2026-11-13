@@ -1,7 +1,7 @@
 'use client'
 
 import { useId } from 'react'
-import type { Run } from '../types/run'
+import type { Run } from '../types'
 import { FeedCard } from './FeedCard'
 import './Feed.css'
 

@@ -1,5 +1,5 @@
 import { useId } from 'react'
-import type { Run } from '../types/run'
+import type { Run } from '../types'
 import {
   distanceLabel,
   durationLabel,
@@ -9,7 +9,7 @@ import {
   formatDuration,
   formatPace,
   paceLabel,
-} from '../lib/format'
+} from '../format'
 import './FeedCard.css'
 
 export function FeedCard({ run }: { run: Run }) {

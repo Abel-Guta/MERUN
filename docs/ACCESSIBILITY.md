@@ -27,7 +27,7 @@ as a checklist for every UI change.
   (the avatar does, because the name is next to it).
 - Abbreviations and symbols that read badly aloud get an `aria-label` with the
   spoken form (`5.2 km` → "5.2 kilometers"). Spoken text comes from the
-  `*Label` helpers in `src/lib/format.ts`.
+  `*Label` helpers in `src/features/runs/format.ts`.
 - Visual-only separators are `aria-hidden="true"`.
 - Text that only screen readers need uses `.visually-hidden`.
 - Generate ids with `useId` when linking labels, headings and descriptions.
