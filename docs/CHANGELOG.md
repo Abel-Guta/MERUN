@@ -288,3 +288,28 @@ Entry format: **What** (the change), **Where** (files), **Why** (the reason).
   runs" with 3 cards; with 12 runs it shows 10 cards and "Load more runs".
 - **Not verified:** the error state and retry, clicking "Load more runs", and
   all async states with a screen reader.
+
+## 15. Add Vitest and tests for helpers and API
+
+- **What:** Test runner and 125 tests: format helpers (contract, fallbacks,
+  bounds, garbage input), response parsers, `fetchRuns` (with a stubbed
+  `fetch`), request validation, and the route handlers end to end against the
+  in-memory store (list, pagination, create, get, per-user list, error codes).
+- **Where:**
+  - `package.json`: `vitest` dev dependency, `test` and `test:watch` scripts.
+  - `vitest.config.ts` (new): node environment, `@/` alias, and a
+    `server-only` alias to the package's own `empty.js`.
+  - `src/features/runs/lib/tests/{format,parse,api}.test.ts` and
+    `src/features/runs/server/tests/{validate,handlers}.test.ts` (new). Tests
+    sit in a `tests/` subfolder of the folder they cover, so each folder stays
+    small as the feature grows.
+  - `AGENTS.md`, `docs/ARCHITECTURE.md`: stack, commands, conventions, known gaps.
+- **Why:** The owner's rule is that functions do not trust their input; the
+  tests pin that down so refactors cannot quietly break it. Handlers are tested
+  by calling them directly, so no HTTP server is needed. Component and hook
+  tests are left out because they need a DOM environment and Testing Library,
+  a separate decision.
+- **Verified:** `npm test` (125 pass), `npm run lint` and `npm run build` pass.
+- **Noted, not changed:** `formatDate('5')` returns a date (May 1 2001) because
+  `Date` parses some bare numeric strings. This matches the documented contract
+  ("parseable string"), so it is not asserted; tighten `toDate` if unwanted.

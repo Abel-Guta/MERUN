@@ -10,8 +10,8 @@ they ran). The home feed fetches runs from the runs API under `/api` in the
 browser. Storage is in memory (seeded from mock JSON, lost on restart). There is
 one page (`/`), no auth and no real persistence yet.
 
-Stack: Next.js 16 (App Router), React 19, TypeScript, plain CSS, oxlint. No UI
-library, no test runner.
+Stack: Next.js 16 (App Router), React 19, TypeScript, plain CSS, oxlint,
+Vitest. No UI library.
 
 Rendering strategy (owner decision): public pages will be static or
 server-rendered. The personalized home feed is client-rendered: `Feed` is a
@@ -26,10 +26,11 @@ it can be split out later if the app outgrows one project.
 | Dev server | `npm run dev` |
 | Type-check and build | `npm run build` (`next build` type-checks) |
 | Lint (includes jsx-a11y) | `npm run lint` |
+| Tests (Vitest, node environment) | `npm test` (`npm run test:watch` while editing) |
 | Serve the production build | `npm run preview` (`next start`, run `build` first) |
 
-Before finishing any change, `npm run build` and `npm run lint` must both pass
-with no warnings. TypeScript runs in strict mode (`"strict": true` in
+Before finishing any change, `npm run build`, `npm run lint` and `npm test` must
+all pass with no warnings. TypeScript runs in strict mode (`"strict": true` in
 `tsconfig.json`); do not weaken it.
 
 ## Layout
@@ -56,6 +57,7 @@ src/
         handlers.ts, store.ts, validate.ts
   shared/                    code used by two or more features
     server/http.ts           error response helper
+vitest.config.ts             Vitest config (`@/` alias, `server-only` alias)
 docs/                        see below
 ```
 
@@ -98,6 +100,13 @@ These are decisions the owner has made. Do not reverse them without asking.
    import rules (see `.oxlintrc.json`) and the build enforces `server-only`.
    Do not weaken or bypass them without asking.
 
+6. **Small steps, human review between each.** Make one small change, stop,
+   and report it so the owner can read it in a minute, understand it and look
+   for what the agent missed. Wait for the go-ahead before the next step. Do
+   not bundle unrelated edits, and do not batch a whole feature into one
+   update. If a task needs several steps, say what they are, do the first and
+   stop. This applies to every agent and session.
+
 ## Conventions
 
 - Components are function components with named exports (`App` is the default
@@ -107,6 +116,11 @@ These are decisions the owner has made. Do not reverse them without asking.
   (`app`, `features`, `shared`). Inside a feature, use relative imports; features
   cannot import themselves through the alias.
 - `app/` route files are one-line re-exports. Put logic in the feature.
+- Tests live in a `tests/` subfolder of the folder they cover (`lib/tests/`,
+  `server/tests/`, `components/tests/`) as `<name>.test.ts`. Create the folder
+  with the first test, not before. Import from `vitest` explicitly (no
+  globals). Server tests work because Vitest aliases `server-only` to the
+  package's own `empty.js`.
 - Files use 2-space indentation, single quotes and no semicolons, matching the
   existing code.
 - Comments explain why, not what. Do not narrate the code, add section banners
@@ -120,9 +134,9 @@ These are decisions the owner has made. Do not reverse them without asking.
 
 Tracked here so nobody has to rediscover them.
 
-- No tests. The behaviour of `src/features/runs/lib/format.ts` is specified in
-  [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) and is the first candidate for
-  Vitest coverage.
+- Tests cover `lib/` (format, parse, api) and `server/` (validate, handlers with
+  the store). There are no component or hook tests yet (`Feed`, `FeedCard`,
+  `useRuns`); that needs a DOM environment and Testing Library.
 - `src/features/runs/mock-runs.ts` casts the seed JSON with `as Run[]`, a type
   assertion rather than a runtime check. It is server-only and our own data;
   replace it when a real database arrives. The feed's API response is validated

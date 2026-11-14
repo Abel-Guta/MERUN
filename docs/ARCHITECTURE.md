@@ -167,6 +167,13 @@ add a spoken counterpart if the value appears in the UI.
 
 ## Tooling
 
+- Vitest (`npm test`, `vitest.config.ts`) in the node environment. Tests live
+  in a `tests/` subfolder of the folder they cover, as `*.test.ts`.
+  `server-only` is aliased to the package's own `empty.js` (the file Next.js
+  picks for server code); without it Vitest loads the default file, which
+  throws. `handlers.test.ts` clears `globalThis.__merunRuns` and
+  resets modules before each test so the in-memory store starts from the seed.
+  `formatDate` tests assert shape, not text, because output depends on locale.
 - `oxlint` with the `react`, `typescript`, `oxc` and `jsx-a11y` plugins
   (`.oxlintrc.json`).
 - `next build` type-checks as part of `npm run build`, with `strict` enabled
