@@ -45,7 +45,7 @@ export function FeedCard({ run }: { run: Run }) {
       </h3>
       {run.notes && <p className="feed-card__notes">{run.notes}</p>}
 
-      <dl className="feed-card__stats" aria-label="Run statistics">
+      <dl className="feed-card__stats">
         <div>
           <dt>Distance</dt>
           <dd aria-label={distanceLabel(run.distanceKm)}>{formatDistance(run.distanceKm)}</dd>

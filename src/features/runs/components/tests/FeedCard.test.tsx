@@ -29,8 +29,8 @@ describe('FeedCard', () => {
   })
 
   it('shows the stats with spoken labels', () => {
-    render(<FeedCard run={run} />)
-    const stats = screen.getByLabelText('Run statistics')
+    const { container } = render(<FeedCard run={run} />)
+    const stats = container.querySelector('dl') as HTMLElement
     expect(within(stats).getByText('5.2 km').getAttribute('aria-label')).toBe('5.2 kilometers')
     expect(within(stats).getByText('28:05').getAttribute('aria-label')).toBe(
       '28 minutes 5 seconds',
@@ -58,8 +58,8 @@ describe('FeedCard', () => {
   })
 
   it('shows fallbacks instead of NaN for bad numbers', () => {
-    render(<FeedCard run={{ ...run, distanceKm: NaN, durationSec: -1 }} />)
-    const stats = screen.getByLabelText('Run statistics')
+    const { container } = render(<FeedCard run={{ ...run, distanceKm: NaN, durationSec: -1 }} />)
+    const stats = container.querySelector('dl') as HTMLElement
     expect(stats.textContent).not.toMatch(/NaN|Infinity|Invalid/)
     expect(within(stats).getAllByText('—')).toHaveLength(3)
   })

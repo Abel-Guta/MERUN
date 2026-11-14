@@ -56,7 +56,7 @@ describe('Feed: first load', () => {
   it('asks the API for the first page of 10', async () => {
     const fetchMock = stubFetch(Promise.resolve(page(['r1'])))
     render(<Feed />)
-    await screen.findByText('Showing 1 runs')
+    await screen.findByText('Showing 1 run')
     expect(fetchMock.mock.calls[0][0]).toBe('/api/runs?limit=10')
   })
 
@@ -112,7 +112,7 @@ describe('Feed: errors and retry', () => {
     )
 
     finishRetry(page(['r1']))
-    expect(await screen.findByText('Showing 1 runs')).not.toBeNull()
+    expect(await screen.findByText('Showing 1 run')).not.toBeNull()
     expect(fetchMock).toHaveBeenCalledTimes(2)
   })
 
@@ -136,7 +136,7 @@ describe('Feed: load more', () => {
 
     stubFetch(Promise.resolve(page(['r1'], null)))
     render(<Feed />)
-    await screen.findByText('Showing 1 runs')
+    await screen.findByText('Showing 1 run')
     expect(screen.queryByRole('button', { name: 'Load more runs' })).toBeNull()
   })
 

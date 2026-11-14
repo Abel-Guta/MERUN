@@ -47,7 +47,9 @@ export function Feed() {
 
       {status === 'ready' && items.length > 0 && (
         <>
-          <output className="visually-hidden">Showing {items.length} runs</output>
+          <output className="visually-hidden">
+            Showing {items.length} {items.length === 1 ? 'run' : 'runs'}
+          </output>
           <ul className="feed__list">
             {items.map((run) => (
               <li key={run.id}>
