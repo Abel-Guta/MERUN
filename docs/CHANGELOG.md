@@ -255,3 +255,36 @@ Entry format: **What** (the change), **Where** (files), **Why** (the reason).
   so reviewers and agents know where to look. Types, mock data, components and
   server code keep their own places.
 - **Verified:** `npm run build` and `npm run lint` pass.
+
+## 14. Feed fetches from the runs API
+
+- **What:** The home feed loads runs in the browser from `GET /api/runs`, with
+  loading, error, empty and "load more" states. The mock data is no longer
+  passed through the page.
+- **Where:**
+  - `src/features/runs/lib/parse.ts` (new): `parseRun` and `parseRunsPage`
+    validate the response as `unknown` and never throw.
+  - `src/features/runs/lib/api.ts` (new): `fetchRuns`.
+  - `src/features/runs/hooks/use-runs.ts` (new): `useRuns` holds the state,
+    aborts on unmount or retry, paginates by cursor and de-duplicates by id.
+  - `src/features/runs/components/Feed.tsx`: takes no props; renders the
+    states. `Feed.css` adds skeleton, message and button styles.
+  - `src/app/page.tsx` renders `<Feed />`. `features/runs/index.ts` no longer
+    exports `mockRuns` (the store still uses it as its seed).
+  - `AGENTS.md`, `README.md`, `docs/ARCHITECTURE.md` (new Client data loading
+    section), `docs/ACCESSIBILITY.md` (async patterns).
+- **Why:** This is the planned client-rendered feed: the static page shell is
+  prerendered and the personalized data loads in the browser. The response is
+  validated because the owner's rule is not to trust input, and this closes the
+  `as Run[]` gap for the feed. One bad item is dropped rather than failing the
+  page. Failures show a fixed message instead of server text. The load-more
+  button uses `aria-disabled` so focus is not lost. No data-fetching library
+  was added; a small hook covers the current needs. `hooks/` is a new folder in
+  the feature layout for React hooks, since `lib/` is for plain helpers.
+- **Verified:** `npm run build` and `npm run lint` pass. A scratch script (not
+  in the repo) fed 11 bad runs and 8 bad pages to the parsers: all rejected, none
+  threw, and a mixed page kept only its valid runs. In headless Chrome against a
+  production server, the HTML ships the loading state, then shows "Showing 3
+  runs" with 3 cards; with 12 runs it shows 10 cards and "Load more runs".
+- **Not verified:** the error state and retry, clicking "Load more runs", and
+  all async states with a screen reader.

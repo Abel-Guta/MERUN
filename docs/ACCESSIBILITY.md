@@ -50,6 +50,13 @@ as a checklist for every UI change.
 - Messages that appear or change use a live region (`role="status"` or the
   `<output>` element). The empty feed message uses `<output>` because the lint
   rule `jsx-a11y/prefer-tag-over-role` requires it.
+- Loading: the region sets `aria-busy`, skeletons are `aria-hidden`, and a
+  visually hidden `<output>` says "Loading runs". After data arrives, a hidden
+  `<output>` announces "Showing N runs".
+- Failures use `role="alert"` and offer a real `<button>` to retry. Show a fixed
+  message, not raw server text.
+- A button that starts work uses `aria-disabled` while busy, not `disabled`,
+  so keyboard focus is not dropped ("Load more runs").
 
 ## Forms (for the planned "log a run" feature)
 
@@ -72,4 +79,5 @@ Silence a rule only with a comment explaining why, and tell the owner.
 
 The markup has been linted but not tested with a screen reader, in a browser
 accessibility tree, or with an automated checker such as axe. Do that before
-calling the feed done.
+calling the feed done. The async states (loading, error, load more) in
+particular have only been checked in HTML output, not with assistive technology.

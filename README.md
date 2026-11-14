@@ -17,9 +17,10 @@ rather than fail.
 
 | Area | State |
 |---|---|
-| Run feed with run cards | Available, using mock data |
+| Run feed with run cards | Available, loaded from the runs API |
 | Logging a new run | Planned |
-| Backend, authentication, persistence | Not started |
+| Runs API (list, read, create) | Available, stored in memory |
+| Authentication, database persistence | Not started |
 
 ### Features
 
@@ -85,6 +86,5 @@ docs/                architecture, accessibility, changelog
 ## Roadmap
 
 - Form to log a new run
-- Persistence (local storage first)
-- Runtime validation of incoming data
+- Database persistence for runs (the API currently stores them in memory)
 - Tests for the formatting helpers

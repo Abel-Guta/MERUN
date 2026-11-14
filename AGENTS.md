@@ -6,9 +6,9 @@ follow the links for detail.
 ## Project
 
 MERUN is a run-logging MVP. Current scope: a feed of run cards (who ran, what
-they ran) rendered from mock JSON. There is one page (`/`) and a runs API
-under `/api` (in-memory storage, not wired to the feed yet). There is no auth or
-persistence yet.
+they ran). The home feed fetches runs from the runs API under `/api` in the
+browser. Storage is in memory (seeded from mock JSON, lost on restart). There is
+one page (`/`), no auth and no real persistence yet.
 
 Stack: Next.js 16 (App Router), React 19, TypeScript, plain CSS, oxlint. No UI
 library, no test runner.
@@ -45,10 +45,12 @@ src/
     runs/                    one folder per feature
       index.ts               public, client-safe surface
       components/            Feed, FeedCard (each with a co-located .css file)
-      lib/                   pure helpers, no server APIs
+      hooks/                 React hooks (useRuns: client-side fetching state)
+      lib/                   plain helpers, no React, no server APIs
         format.ts            formatting helpers (visual + screen-reader text)
+        api.ts, parse.ts     fetch the runs API, validate its response
       types.ts               User and Run types
-      mock-runs.ts, seed.json  mock data
+      mock-runs.ts, seed.json  mock data that seeds the store
       server/                server-only code
         index.ts             public server surface (route handlers)
         handlers.ts, store.ts, validate.ts
@@ -60,7 +62,7 @@ docs/                        see below
 Feature structure: a feature owns its UI, types, server logic and data. Create a
 new folder under `features/` when a new feature starts; do not add empty ones.
 Pure helper modules (formatters, parsers, calculations) go in the feature's
-`lib/` folder. Server-only code goes in `server/`. Move code to `shared/` only
+`lib/` folder and React hooks in `hooks/`. Server-only code goes in `server/`. Move code to `shared/` only
 when a second feature needs it.
 
 ## Documentation map
@@ -121,9 +123,13 @@ Tracked here so nobody has to rediscover them.
 - No tests. The behaviour of `src/features/runs/lib/format.ts` is specified in
   [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) and is the first candidate for
   Vitest coverage.
-- `src/features/runs/mock-runs.ts` casts the JSON with `as Run[]`, which is a type assertion and
-  not a runtime check. Replace it with a validator at the data boundary when a
-  real data source arrives.
+- `src/features/runs/mock-runs.ts` casts the seed JSON with `as Run[]`, a type
+  assertion rather than a runtime check. It is server-only and our own data;
+  replace it when a real database arrives. The feed's API response is validated
+  (`lib/parse.ts`).
+- The feed has no data-fetching library, caching or revalidation, and the
+  loading, error and load-more states have not been tested with a screen
+  reader.
 - User avatars load from a remote host (`i.pravatar.cc`).
 - Next planned feature: a form to log a new run (see accessibility notes for
   forms).

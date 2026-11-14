@@ -3,16 +3,17 @@
 ## Data flow
 
 ```
-src/features/runs/seed.json (via mock-runs.ts)
-        │  imported, asserted as Run[]
-        ▼
- app/page.tsx ──► Feed (runs) ──► FeedCard (run) × N
-                                   │
-                                   └─ features/runs/lib/format.ts (display + spoken text)
+browser                                          server
+Feed ─► useRuns ─► lib/api.ts ── GET /api/runs ──► Route Handler ─► store (in memory)
+ │                     │                                                  ▲
+ │                     └─ lib/parse.ts (validates the response)           │
+ ▼                                                                  seed.json
+FeedCard (run) × N ─► lib/format.ts (display + spoken text)
 ```
 
-Data moves one way, from the page down through props. There is no shared state
-yet. `app/layout.tsx` wraps every route with the skip link, header and `<main>`.
+The page HTML is prerendered with the loading state; the browser then fetches
+the first page of runs. `app/layout.tsx` wraps every route with the skip link,
+header and `<main>`.
 
 ## Rendering
 
@@ -20,12 +21,27 @@ yet. `app/layout.tsx` wraps every route with the skip link, header and `<main>`.
   components and are prerendered at build time.
 - Public pages (planned) will be static or server-rendered.
 - The home feed is client-rendered. `Feed` is marked `'use client'` because it
-  will own browser-side fetching; `FeedCard` has no interactivity and has no
+  owns browser-side fetching (`useRuns`); `FeedCard` has no interactivity and has no
   directive, but it ships in the client bundle because `Feed` imports it. Put
   `'use client'` on the smallest component that needs state, effects or event
   handlers (for example a like button), not on whole pages.
-- The API will live in this project as Route Handlers. Keep server logic in
-  plain modules (not inside the handlers) so it can be extracted later.
+- The API lives in this project as Route Handlers. Keep server logic in plain
+  modules (not inside the handlers) so it can be extracted later.
+
+## Client data loading
+
+- `lib/api.ts` (`fetchRuns`) calls `GET /api/runs` and throws on a non-OK status
+  or an unexpected shape. The UI shows a fixed message; server error text is
+  not displayed.
+- `lib/parse.ts` (`parseRun`, `parseRunsPage`) takes `unknown`, never throws,
+  and returns `null` for invalid data. A malformed response envelope is an
+  error; a malformed item is dropped so one bad run does not blank the feed.
+  It checks types only; range checks and fallbacks stay in `format.ts`.
+- `hooks/use-runs.ts` (`useRuns`) holds the state: first page (with abort on
+  unmount or retry), `loadMore` with the cursor, de-duplication by id, and
+  failure flags for both. There is no data-fetching library yet; consider SWR or
+  TanStack Query if caching or revalidation is needed.
+- Page size is 10 (`PAGE_SIZE`); the API allows up to 50.
 
 ## Code organization
 
@@ -100,8 +116,8 @@ seconds. Pace is never stored; it is derived from the two.
 | Component | Renders | Notes |
 |---|---|---|
 | `RootLayout` (`app/layout.tsx`) | Skip link, `<header>` with `<h1>`, `<main id="main">` | `main` has `tabIndex={-1}` so the skip link can move focus into it |
-| `HomePage` (`app/page.tsx`) | `<Feed>` | Passes `mockRuns` from `@/features/runs` until the feed fetches its own data |
-| `Feed` | `<section>` labelled by an `<h2>`, a `<ul>` of cards | Client component. Empty list renders an `<output>` message |
+| `HomePage` (`app/page.tsx`) | `<Feed />` | No data passed; the feed fetches its own |
+| `Feed` | `<section>` labelled by an `<h2>` with `aria-busy`, a `<ul>` of cards | Client component. States: loading (skeletons, hidden "Loading runs" status), error (`role="alert"` and a "Try again" button), empty (`<output>`), ready, plus a "Load more runs" button |
 | `FeedCard` | One `<article>` labelled by its `<h3>` title | Header (avatar, name, username, date, location), notes, stats `<dl>` |
 
 Cards use `<h3>` because the page outline is `h1` (app) → `h2` (feed) → `h3`

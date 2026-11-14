@@ -16,3 +16,43 @@
   text-align: center;
   color: var(--color-text-muted);
 }
+
+.feed__skeleton {
+  height: 168px;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: var(--color-surface);
+  animation: feed-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes feed-pulse {
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.feed__message {
+  margin: 0 0 16px;
+  text-align: center;
+  color: var(--color-text);
+}
+
+.feed__button {
+  padding: 8px 16px;
+  font: inherit;
+  color: var(--color-text);
+  background: var(--color-surface);
+  border: 2px solid var(--color-border);
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.feed__button[aria-disabled='true'] {
+  color: var(--color-text-muted);
+  cursor: progress;
+}
+
+.feed__more {
+  display: block;
+  margin: 16px auto 0;
+}

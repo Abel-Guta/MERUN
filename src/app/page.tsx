@@ -1,5 +1,5 @@
-import { Feed, mockRuns } from '@/features/runs'
+import { Feed } from '@/features/runs'
 
 export default function HomePage() {
-  return <Feed runs={mockRuns} />
+  return <Feed />
 }
