@@ -313,3 +313,27 @@ Entry format: **What** (the change), **Where** (files), **Why** (the reason).
 - **Noted, not changed:** `formatDate('5')` returns a date (May 1 2001) because
   `Date` parses some bare numeric strings. This matches the documented contract
   ("parseable string"), so it is not asserted; tighten `toDate` if unwanted.
+
+## 16. Component tests for FeedCard and Feed
+
+- **What:** 20 tests. `FeedCard`: article named by its `<h3>`, spoken stat
+  labels, machine-readable `<time>`, decorative avatar, optional notes,
+  fallbacks instead of `NaN`. `Feed`: first load (busy, count announcement,
+  first request, empty), errors and retry (fixed alert, network and shape
+  failures, loading again on retry), and load more (cursor request, append,
+  de-duplication, `aria-disabled` with focus kept, failure keeps loaded runs
+  and retries the same cursor).
+- **Where:**
+  - `package.json`: `jsdom`, `@testing-library/react`, `@testing-library/dom`.
+  - `vitest.config.ts`: test pattern also matches `.tsx`.
+  - `src/features/runs/components/tests/{FeedCard,Feed}.test.tsx` (new).
+  - `AGENTS.md`, `docs/ARCHITECTURE.md`: commands, conventions, known gaps.
+- **Why:** These are the states listed as untested in Known gaps. jsdom is
+  enabled per file so the server tests keep running in node. Queries use roles
+  and labels so the tests check what assistive technology would see.
+- **Verified:** `npm test` (145 pass), `npm run lint` and `npm run build` pass.
+- **Not covered:** `useRuns` aborting on unmount, and screen reader output
+  (jsdom only checks markup and roles).
+- **Noted, not changed:** `Feed` says "Showing 1 runs" for a single run, and a
+  test pins that text. `FeedCard` puts `aria-label` on a `<dl>`, which has no
+  ARIA role, so the "Run statistics" name may not be announced.

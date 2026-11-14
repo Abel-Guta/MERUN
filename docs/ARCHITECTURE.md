@@ -168,7 +168,12 @@ add a spoken counterpart if the value appears in the UI.
 ## Tooling
 
 - Vitest (`npm test`, `vitest.config.ts`) in the node environment. Tests live
-  in a `tests/` subfolder of the folder they cover, as `*.test.ts`.
+  in a `tests/` subfolder of the folder they cover, as `*.test.ts` (`.tsx` for
+  components).
+- Component tests use jsdom and Testing Library, switched on per file with a
+  `// @vitest-environment jsdom` first line, so server tests stay in node. They
+  call `afterEach(cleanup)` themselves because test globals are off, query by
+  role or label like a user would, and replace `fetch` with `vi.stubGlobal`.
   `server-only` is aliased to the package's own `empty.js` (the file Next.js
   picks for server code); without it Vitest loads the default file, which
   throws. `handlers.test.ts` clears `globalThis.__merunRuns` and

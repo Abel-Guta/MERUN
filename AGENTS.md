@@ -26,7 +26,7 @@ it can be split out later if the app outgrows one project.
 | Dev server | `npm run dev` |
 | Type-check and build | `npm run build` (`next build` type-checks) |
 | Lint (includes jsx-a11y) | `npm run lint` |
-| Tests (Vitest, node environment) | `npm test` (`npm run test:watch` while editing) |
+| Tests (Vitest; node, jsdom for components) | `npm test` (`npm run test:watch` while editing) |
 | Serve the production build | `npm run preview` (`next start`, run `build` first) |
 
 Before finishing any change, `npm run build`, `npm run lint` and `npm test` must
@@ -117,7 +117,7 @@ These are decisions the owner has made. Do not reverse them without asking.
   cannot import themselves through the alias.
 - `app/` route files are one-line re-exports. Put logic in the feature.
 - Tests live in a `tests/` subfolder of the folder they cover (`lib/tests/`,
-  `server/tests/`, `components/tests/`) as `<name>.test.ts`. Create the folder
+  `server/tests/`, `components/tests/`) as `<name>.test.ts` (`.tsx` for components). Create the folder
   with the first test, not before. Import from `vitest` explicitly (no
   globals). Server tests work because Vitest aliases `server-only` to the
   package's own `empty.js`.
@@ -135,8 +135,10 @@ These are decisions the owner has made. Do not reverse them without asking.
 Tracked here so nobody has to rediscover them.
 
 - Tests cover `lib/` (format, parse, api) and `server/` (validate, handlers with
-  the store). There are no component or hook tests yet (`Feed`, `FeedCard`,
-  `useRuns`); that needs a DOM environment and Testing Library.
+  the store), and `FeedCard` and `Feed` (loading, error, retry, empty and
+  load-more states, via `useRuns`, with `fetch` stubbed). There are no direct
+  `useRuns` tests, and no test aborts the request on unmount. Component tests
+  check markup and roles in jsdom, not screen reader output.
 - `src/features/runs/mock-runs.ts` casts the seed JSON with `as Run[]`, a type
   assertion rather than a runtime check. It is server-only and our own data;
   replace it when a real database arrives. The feed's API response is validated
