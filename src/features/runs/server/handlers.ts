@@ -28,8 +28,15 @@ export async function listRunsHandler(request: NextRequest) {
     return errorResponse(400, 'invalid_query', 'Invalid query parameters.', limit.fields)
   }
 
-  const items = await listRuns({ limit: limit.value })
-  return Response.json({ items, nextCursor: null })
+  const result = await listRuns({
+    limit: limit.value,
+    cursor: request.nextUrl.searchParams.get('cursor') ?? undefined,
+  })
+  if (!result.ok) {
+    return errorResponse(400, 'invalid_cursor', 'The cursor does not match any run.')
+  }
+
+  return Response.json({ items: result.items, nextCursor: result.nextCursor })
 }
 
 export async function createRunHandler(request: Request) {
