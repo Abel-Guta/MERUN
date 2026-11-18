@@ -1,7 +1,7 @@
 import 'server-only'
 import type { NextRequest } from 'next/server'
 import { errorResponse } from '@/shared/server/http'
-import { createRun, getRun, listRuns, userExists } from './store'
+import { createRun, getRun, listRuns, listRunsInMemory, userExists } from './store'
 import { parseLimit, parseNewRun } from './validate'
 
 function listResponse(searchParams: URLSearchParams, username?: string): Response {
@@ -10,7 +10,7 @@ function listResponse(searchParams: URLSearchParams, username?: string): Respons
     return errorResponse(400, 'invalid_query', 'Invalid query parameters.', limit.fields)
   }
 
-  const result = listRuns({
+  const result = listRunsInMemory({
     limit: limit.value,
     cursor: searchParams.get('cursor') ?? undefined,
     username,
@@ -22,8 +22,14 @@ function listResponse(searchParams: URLSearchParams, username?: string): Respons
   return Response.json({ items: result.items, nextCursor: result.nextCursor })
 }
 
-export function listRunsHandler(request: NextRequest) {
-  return listResponse(request.nextUrl.searchParams)
+export async function listRunsHandler(request: NextRequest) {
+  const limit = parseLimit(request.nextUrl.searchParams.get('limit'))
+  if (!limit.ok) {
+    return errorResponse(400, 'invalid_query', 'Invalid query parameters.', limit.fields)
+  }
+
+  const items = await listRuns({ limit: limit.value })
+  return Response.json({ items, nextCursor: null })
 }
 
 export async function createRunHandler(request: Request) {

@@ -32,38 +32,40 @@ const newRun = {
 
 describe('GET /api/runs', () => {
   it('returns runs newest first', async () => {
-    const body = await handlers.listRunsHandler(listRequest()).json()
+    const body = await (await handlers.listRunsHandler(listRequest())).json()
     const dates = body.items.map((run: { date: string }) => run.date)
     expect(dates).toEqual([...dates].sort().reverse())
   })
 
   it('paginates with a cursor and ends with nextCursor null', async () => {
-    const first = await handlers.listRunsHandler(listRequest('?limit=2')).json()
+    const first = await (await handlers.listRunsHandler(listRequest('?limit=2'))).json()
     expect(first.items).toHaveLength(2)
     expect(first.nextCursor).toBe(first.items[1].id)
 
     const seen = new Set<string>(first.items.map((run: { id: string }) => run.id))
     let cursor: string | null = first.nextCursor
     while (cursor !== null) {
-      const page = await handlers.listRunsHandler(listRequest(`?limit=2&cursor=${cursor}`)).json()
+      const page = await (
+        await handlers.listRunsHandler(listRequest(`?limit=2&cursor=${cursor}`))
+      ).json()
       for (const run of page.items) {
         expect(seen.has(run.id)).toBe(false)
         seen.add(run.id)
       }
       cursor = page.nextCursor
     }
-    const all = await handlers.listRunsHandler(listRequest('?limit=50')).json()
+    const all = await (await handlers.listRunsHandler(listRequest('?limit=50'))).json()
     expect(seen.size).toBe(all.items.length)
   })
 
   it('rejects a bad limit with invalid_query', async () => {
-    const response = handlers.listRunsHandler(listRequest('?limit=0'))
+    const response = await handlers.listRunsHandler(listRequest('?limit=0'))
     expect(response.status).toBe(400)
     expect((await response.json()).error.code).toBe('invalid_query')
   })
 
   it('rejects an unknown cursor with invalid_cursor', async () => {
-    const response = handlers.listRunsHandler(listRequest('?cursor=nope'))
+    const response = await handlers.listRunsHandler(listRequest('?cursor=nope'))
     expect(response.status).toBe(400)
     expect((await response.json()).error.code).toBe('invalid_cursor')
   })

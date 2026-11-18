@@ -1,6 +1,8 @@
 import 'server-only'
+import { getSupabase } from '@/shared/server/supabase'
 import { mockRuns } from '../mock-runs'
 import type { Run } from '../types'
+import { toRun } from './to-run'
 import type { NewRun } from './validate'
 
 // In-memory store seeded from the mock data. It lives on globalThis so dev-mode
@@ -21,7 +23,21 @@ export type ListResult =
   | { ok: true; items: Run[]; nextCursor: string | null }
   | { ok: false; code: 'invalid_cursor' }
 
-export function listRuns(options: {
+export async function listRuns(options: { limit: number }): Promise<Run[]> {
+  const { data, error } = await getSupabase()
+    .from('runs')
+    .select(
+      'id, title, distance_km, duration_sec, date, location, notes, profiles(id, name, username, avatar_url)',
+    )
+    .order('date', { ascending: false })
+    .order('id', { ascending: false })
+    .limit(options.limit)
+
+  if (error) throw new Error(`Could not list runs: ${error.message}`)
+  return data.map((row) => toRun(row))
+}
+
+export function listRunsInMemory(options: {
   limit: number
   cursor?: string
   username?: string
