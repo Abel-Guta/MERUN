@@ -15,10 +15,6 @@ const store = (globalStore.__merunRuns ??= [...mockRuns])
 // No auth yet, so every created run belongs to the first seeded user.
 const currentUser = store[0].user
 
-function newestFirst(a: Run, b: Run): number {
-  return b.date.localeCompare(a.date) || b.id.localeCompare(a.id)
-}
-
 export type ListResult =
   | { ok: true; items: Run[]; nextCursor: string | null }
   | { ok: false; code: 'invalid_cursor' }
@@ -47,18 +43,32 @@ function decodeCursor(cursor: string): { date: string; id: string } | null {
   }
 }
 
+const USERNAME = /^[A-Za-z0-9_]{1,30}$/
+
+// ilike treats _ and % as wildcards, and usernames may contain _.
+function exactIlike(username: string): string {
+  return username.replace(/[\\%_]/g, '\\$&')
+}
+
 export async function listRuns(options: {
   limit: number
   cursor?: string
+  username?: string
 }): Promise<ListResult> {
+  // !inner makes the username filter drop runs instead of just blanking the profile.
   let query = getSupabase()
     .from('runs')
     .select(
-      'id, title, distance_km, duration_sec, date, location, notes, profiles(id, name, username, avatar_url)',
+      'id, title, distance_km, duration_sec, date, location, notes, profiles!inner(id, name, username, avatar_url)',
     )
     .order('date', { ascending: false })
     .order('id', { ascending: false })
     .limit(options.limit + 1)
+
+  if (options.username !== undefined) {
+    if (!USERNAME.test(options.username)) return { ok: true, items: [], nextCursor: null }
+    query = query.ilike('profiles.username', exactIlike(options.username))
+  }
 
   if (options.cursor !== undefined) {
     const cursor = decodeCursor(options.cursor)
@@ -81,35 +91,19 @@ export async function listRuns(options: {
   return { ok: true, items, nextCursor }
 }
 
-export function listRunsInMemory(options: {
-  limit: number
-  cursor?: string
-  username?: string
-}): ListResult {
-  const username = options.username?.toLowerCase()
-  const sorted = store
-    .filter((run) => username === undefined || run.user.username.toLowerCase() === username)
-    .sort(newestFirst)
-
-  let start = 0
-  if (options.cursor !== undefined) {
-    const index = sorted.findIndex((run) => run.id === options.cursor)
-    if (index === -1) return { ok: false, code: 'invalid_cursor' }
-    start = index + 1
-  }
-
-  const items = sorted.slice(start, start + options.limit)
-  const hasMore = start + options.limit < sorted.length
-  return { ok: true, items, nextCursor: hasMore ? items[items.length - 1].id : null }
-}
-
 export function getRun(id: string): Run | undefined {
   return store.find((run) => run.id === id)
 }
 
-export function userExists(username: string): boolean {
-  const lower = username.toLowerCase()
-  return store.some((run) => run.user.username.toLowerCase() === lower)
+export async function userExists(username: string): Promise<boolean> {
+  if (!USERNAME.test(username)) return false
+  const { data, error } = await getSupabase()
+    .from('profiles')
+    .select('id')
+    .ilike('username', exactIlike(username))
+    .limit(1)
+  if (error) throw new Error(`Could not look up user: ${error.message}`)
+  return data.length > 0
 }
 
 export function createRun(input: NewRun): Run {

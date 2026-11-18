@@ -1,16 +1,16 @@
 import 'server-only'
 import type { NextRequest } from 'next/server'
 import { errorResponse } from '@/shared/server/http'
-import { createRun, getRun, listRuns, listRunsInMemory, userExists } from './store'
+import { createRun, getRun, listRuns, userExists } from './store'
 import { parseLimit, parseNewRun } from './validate'
 
-function listResponse(searchParams: URLSearchParams, username?: string): Response {
+async function listResponse(searchParams: URLSearchParams, username?: string): Promise<Response> {
   const limit = parseLimit(searchParams.get('limit'))
   if (!limit.ok) {
     return errorResponse(400, 'invalid_query', 'Invalid query parameters.', limit.fields)
   }
 
-  const result = listRunsInMemory({
+  const result = await listRuns({
     limit: limit.value,
     cursor: searchParams.get('cursor') ?? undefined,
     username,
@@ -22,21 +22,8 @@ function listResponse(searchParams: URLSearchParams, username?: string): Respons
   return Response.json({ items: result.items, nextCursor: result.nextCursor })
 }
 
-export async function listRunsHandler(request: NextRequest) {
-  const limit = parseLimit(request.nextUrl.searchParams.get('limit'))
-  if (!limit.ok) {
-    return errorResponse(400, 'invalid_query', 'Invalid query parameters.', limit.fields)
-  }
-
-  const result = await listRuns({
-    limit: limit.value,
-    cursor: request.nextUrl.searchParams.get('cursor') ?? undefined,
-  })
-  if (!result.ok) {
-    return errorResponse(400, 'invalid_cursor', 'The cursor does not match any run.')
-  }
-
-  return Response.json({ items: result.items, nextCursor: result.nextCursor })
+export function listRunsHandler(request: NextRequest) {
+  return listResponse(request.nextUrl.searchParams)
 }
 
 export async function createRunHandler(request: Request) {
@@ -71,6 +58,6 @@ export async function listUserRunsHandler(
   { params }: { params: Promise<{ username: string }> },
 ) {
   const { username } = await params
-  if (!userExists(username)) return errorResponse(404, 'not_found', 'User not found.')
+  if (!(await userExists(username))) return errorResponse(404, 'not_found', 'User not found.')
   return listResponse(request.nextUrl.searchParams, username)
 }
