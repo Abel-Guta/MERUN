@@ -7,8 +7,12 @@ follow the links for detail.
 
 MERUN is a run-logging MVP. Current scope: a feed of run cards (who ran, what
 they ran). The home feed fetches runs from the runs API under `/api` in the
-browser. Storage is in memory (seeded from mock JSON, lost on restart). There is
-one page (`/`), no auth and no real persistence yet.
+browser. Storage is mixed while the move to Supabase (Postgres) finishes:
+listing runs (feed, cursor pagination, per-user filter) and the user lookup read
+from Supabase through the server-only secret key. `getRun` and `createRun` are
+still in memory (seeded from mock JSON, lost on restart), so created runs are not
+persisted, and the client does not call either yet. There is one page (`/`) and
+no auth; new runs will be attributed to the `abel` profile until OAuth exists.
 
 Stack: Next.js 16 (App Router), React 19, TypeScript, plain CSS, oxlint,
 Vitest. No UI library.
@@ -54,9 +58,12 @@ src/
       mock-runs.ts, seed.json  mock data that seeds the store
       server/                server-only code
         index.ts             public server surface (route handlers)
-        handlers.ts, store.ts, validate.ts
+        handlers.ts, store.ts, to-run.ts, validate.ts
+                             to-run.ts maps a database row to a Run
   shared/                    code used by two or more features
     server/http.ts           error response helper
+    server/supabase.ts       lazy server-only Supabase client (secret key)
+supabase/migrations/         SQL schema and grants, applied by hand in the SQL Editor
 vitest.config.ts             Vitest config (`@/` alias, `server-only` alias)
 docs/                        see below
 ```
@@ -134,8 +141,14 @@ These are decisions the owner has made. Do not reverse them without asking.
 
 Tracked here so nobody has to rediscover them.
 
-- Tests cover `lib/` (format, parse, api) and `server/` (validate, handlers with
-  the store), and `FeedCard` and `Feed` (loading, error, retry, empty and
+- The list tests in `server/tests/handlers.test.ts` (`GET /api/runs` and
+  `GET /api/users/:username/runs`, 5 tests) call the real handlers, which now
+  query Supabase, so they fail without database access. This is a known break
+  until the owner decides between live integration tests and a fake store; the
+  rule that all tests pass before finishing a change is suspended for these.
+  `toRun` has its own passing tests; `listRuns` and `userExists` have none.
+- Tests cover `lib/` (format, parse, api) and `server/` (validate, to-run,
+  handlers), and `FeedCard` and `Feed` (loading, error, retry, empty and
   load-more states, via `useRuns`, with `fetch` stubbed). There are no direct
   `useRuns` tests, and no test aborts the request on unmount. Component tests
   check markup and roles in jsdom, not screen reader output.
@@ -149,3 +162,13 @@ Tracked here so nobody has to rediscover them.
 - User avatars load from a remote host (`i.pravatar.cc`).
 - Next planned feature: a form to log a new run (see accessibility notes for
   forms).
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+## This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->
