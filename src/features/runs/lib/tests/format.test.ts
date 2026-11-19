@@ -9,6 +9,8 @@ import {
   formatDistance,
   formatDuration,
   formatPace,
+  kmTicks,
+  MAX_KM_TICKS,
   paceLabel,
 } from '../format'
 
@@ -80,6 +82,24 @@ describe('formatDistance / distanceLabel', () => {
   it.each(garbage)('falls back for %s', (value) => {
     expect(formatDistance(value)).toBe(FALLBACK)
     expect(distanceLabel(value)).toBe(FALLBACK_LABEL)
+  })
+})
+
+describe('kmTicks', () => {
+  it('counts whole kilometres', () => {
+    expect(kmTicks(5.2)).toBe(5)
+    expect(kmTicks(0.9)).toBe(0)
+    expect(kmTicks(1)).toBe(1)
+  })
+
+  it('caps at the maximum', () => {
+    expect(kmTicks(10)).toBe(MAX_KM_TICKS)
+    expect(kmTicks(42.2)).toBe(MAX_KM_TICKS)
+    expect(kmTicks(100_001)).toBe(0)
+  })
+
+  it.each(garbage)('gives no ticks for %s', (value) => {
+    expect(kmTicks(value)).toBe(0)
   })
 })
 

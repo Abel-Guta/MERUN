@@ -95,6 +95,15 @@ export function distanceLabel(distanceKm: unknown): string {
   return km === null ? FALLBACK_LABEL : `${km.toFixed(1)} kilometers`
 }
 
+export const MAX_KM_TICKS = 10
+
+// Whole kilometres for the card's decorative tick meter, capped so a long run
+// does not stretch the card. Bad input gives no ticks.
+export function kmTicks(distanceKm: unknown): number {
+  const km = toKm(distanceKm)
+  return km === null ? 0 : Math.min(Math.floor(km), MAX_KM_TICKS)
+}
+
 export function paceLabel(distanceKm: unknown, durationSec: unknown): string {
   const pace = toPaceSec(distanceKm, durationSec)
   if (pace === null) return FALLBACK_LABEL

@@ -82,3 +82,20 @@
   font-weight: 800;
   line-height: 1;
 }
+
+/* One tick per whole kilometre, up to ten. Decorative only. */
+.feed-card__ticks {
+  display: flex;
+  gap: var(--space-1);
+  margin-top: var(--space-2);
+}
+
+.feed-card__tick {
+  width: var(--space-2);
+  height: var(--space-4);
+  background: var(--color-border);
+}
+
+.feed-card__tick--on {
+  background: var(--color-accent);
+}
