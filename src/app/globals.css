@@ -10,6 +10,9 @@
   --color-danger: #d9382b; /* fills and borders only, fails AA as text */
   --color-danger-text: #ec5a4e; /* 5.4:1 on bg, 4.85:1 on surface */
   --color-focus: #f5c400;
+  --color-ridge-far: #1c2f26;
+  --color-ridge-mid: #132319;
+  --color-ridge-near: #09110e;
 
   --font-body: var(--font-saira), system-ui, sans-serif;
 

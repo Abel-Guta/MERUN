@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { useId } from 'react'
+import { HeroArt } from './HeroArt'
 import './Hero.css'
 
 export function Hero() {
@@ -19,6 +20,7 @@ export function Hero() {
           See the feed
         </Link>
       </div>
+      <HeroArt />
     </section>
   )
 }

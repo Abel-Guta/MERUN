@@ -1,0 +1,95 @@
+.hero-art {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: clamp(18rem, 42vw, 40rem);
+}
+
+.hero-art__sun {
+  fill: var(--color-accent);
+}
+
+.hero-art__ring {
+  fill: none;
+  stroke: var(--color-accent);
+  stroke-width: 2;
+}
+
+.hero-art__dial {
+  fill: none;
+  stroke: var(--color-accent);
+  stroke-width: 6;
+  stroke-dasharray: 2 14;
+}
+
+.hero-art__far {
+  fill: var(--color-ridge-far);
+}
+
+.hero-art__mid {
+  fill: var(--color-ridge-mid);
+}
+
+.hero-art__near {
+  fill: var(--color-ridge-near);
+}
+
+.hero-art__route {
+  fill: none;
+  stroke: var(--color-accent);
+  stroke-width: 5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.hero-art__mark {
+  stroke: var(--color-accent);
+  stroke-width: 4;
+  fill: var(--color-accent);
+}
+
+@media (min-width: 48rem) {
+  .hero-art__route {
+    stroke-width: 3;
+  }
+
+  .hero-art__mark {
+    stroke-width: 3;
+  }
+}
+
+/* The one moment of motion: the route draws across the ridge and the km marks
+   light up in order. Without motion everything is simply shown. */
+@media (prefers-reduced-motion: no-preference) {
+  .hero-art__route {
+    stroke-dasharray: 1;
+    animation: hero-route 2.6s cubic-bezier(0.3, 0.1, 0.2, 1) 0.3s both;
+  }
+
+  .hero-art__mark {
+    animation: hero-mark 0.4s ease-out both;
+    animation-delay: calc(0.5s + var(--i) * 0.22s);
+  }
+}
+
+@keyframes hero-route {
+  from {
+    stroke-dashoffset: 1;
+  }
+
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes hero-mark {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
