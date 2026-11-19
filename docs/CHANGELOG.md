@@ -337,3 +337,21 @@ Entry format: **What** (the change), **Where** (files), **Why** (the reason).
 - **Noted, not changed:** `Feed` says "Showing 1 runs" for a single run, and a
   test pins that text. `FeedCard` puts `aria-label` on a `<dl>`, which has no
   ARIA role, so the "Run statistics" name may not be announced.
+
+## 17. Read and create single runs in Supabase
+
+- **What:** `getRun` and `createRun` now use Supabase instead of the in-memory
+  array, which is removed. `getRun` returns 404 for a non-UUID id. `createRun`
+  inserts the run and returns it through `toRun`. A temporary
+  `currentProfileId` looks up the `abel` profile id until auth exists, then it
+  is deleted and the id comes from the session.
+- **Where:** `src/features/runs/server/store.ts`, `server/handlers.ts` (both
+  handlers now `await`), `AGENTS.md`, `README.md`, `docs/ARCHITECTURE.md`.
+- **Why:** Created runs were lost on restart. This finishes the move of the
+  runs API to Supabase.
+- **Verified:** `npm run build` and `npm run lint` pass. `getRun` was checked
+  live (real id 200, unknown UUID 404, non-UUID 404). `createRun` was checked
+  live: a valid POST returned 201 with `Location`, the run belonged to `abel`,
+  `GET` returned it and it led the feed; an invalid body returned 422. `npm
+  test`: 6 handler tests fail without Supabase env vars.
+- **Noted, not changed:** `mock-runs.ts` and `seed.json` are now unused.

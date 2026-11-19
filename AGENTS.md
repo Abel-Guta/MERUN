@@ -7,12 +7,12 @@ follow the links for detail.
 
 MERUN is a run-logging MVP. Current scope: a feed of run cards (who ran, what
 they ran). The home feed fetches runs from the runs API under `/api` in the
-browser. Storage is mixed while the move to Supabase (Postgres) finishes:
-listing runs (feed, cursor pagination, per-user filter) and the user lookup read
-from Supabase through the server-only secret key. `getRun` and `createRun` are
-still in memory (seeded from mock JSON, lost on restart), so created runs are not
-persisted, and the client does not call either yet. There is one page (`/`) and
-no auth; new runs will be attributed to the `abel` profile until OAuth exists.
+browser. Runs are stored in Supabase (Postgres), reached only from the server
+through the secret key: list (feed, cursor pagination, per-user filter), get,
+create and the user lookup. The client does not call get or create yet. There is
+one page (`/`) and no auth; `createRun` attributes every new run to the `abel`
+profile through a temporary mock (`currentProfileId` in `store.ts`) that is
+deleted once OAuth exists and the profile id comes from the session.
 
 Stack: Next.js 16 (App Router), React 19, TypeScript, plain CSS, oxlint,
 Vitest. No UI library.
@@ -55,7 +55,7 @@ src/
         format.ts            formatting helpers (visual + screen-reader text)
         api.ts, parse.ts     fetch the runs API, validate its response
       types.ts               User and Run types
-      mock-runs.ts, seed.json  mock data that seeds the store
+      mock-runs.ts, seed.json  mock data, no longer used by the store
       server/                server-only code
         index.ts             public server surface (route handlers)
         handlers.ts, store.ts, to-run.ts, validate.ts
@@ -141,21 +141,22 @@ These are decisions the owner has made. Do not reverse them without asking.
 
 Tracked here so nobody has to rediscover them.
 
-- The list tests in `server/tests/handlers.test.ts` (`GET /api/runs` and
-  `GET /api/users/:username/runs`, 5 tests) call the real handlers, which now
-  query Supabase, so they fail without database access. This is a known break
-  until the owner decides between live integration tests and a fake store; the
-  rule that all tests pass before finishing a change is suspended for these.
-  `toRun` has its own passing tests; `listRuns` and `userExists` have none.
+- Six tests in `server/tests/handlers.test.ts` (`GET /api/runs` x3,
+  `POST /api/runs`, `GET /api/users/:username/runs` x2) call the real handlers,
+  which now query Supabase, so they fail without database access (Vitest does
+  not load the Supabase env vars). This is a known break until the owner decides
+  between live integration tests and a fake store; the rule that all tests pass
+  before finishing a change is suspended for these. A live POST test would
+  insert a real row each run. `toRun` has its own passing tests; `listRuns`,
+  `getRun`, `createRun` and `userExists` have none.
 - Tests cover `lib/` (format, parse, api) and `server/` (validate, to-run,
   handlers), and `FeedCard` and `Feed` (loading, error, retry, empty and
   load-more states, via `useRuns`, with `fetch` stubbed). There are no direct
   `useRuns` tests, and no test aborts the request on unmount. Component tests
   check markup and roles in jsdom, not screen reader output.
-- `src/features/runs/mock-runs.ts` casts the seed JSON with `as Run[]`, a type
-  assertion rather than a runtime check. It is server-only and our own data;
-  replace it when a real database arrives. The feed's API response is validated
-  (`lib/parse.ts`).
+- `src/features/runs/mock-runs.ts` and `seed.json` are now unused, since the
+  store reads Supabase. Delete them (and the seed note in the docs) in a
+  separate step. The feed's API response is validated (`lib/parse.ts`).
 - The feed has no data-fetching library, caching or revalidation, and the
   loading, error and load-more states have not been tested with a screen
   reader.

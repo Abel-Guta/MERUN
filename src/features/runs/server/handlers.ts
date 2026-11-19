@@ -39,7 +39,7 @@ export async function createRunHandler(request: Request) {
     return errorResponse(422, 'validation_failed', 'The run is invalid.', parsed.fields)
   }
 
-  const run = createRun(parsed.value)
+  const run = await createRun(parsed.value)
   return Response.json(run, { status: 201, headers: { Location: `/api/runs/${run.id}` } })
 }
 

@@ -1,19 +1,8 @@
 import 'server-only'
 import { getSupabase } from '@/shared/server/supabase'
-import { mockRuns } from '../mock-runs'
 import type { Run } from '../types'
 import { toRun } from './to-run'
 import type { NewRun } from './validate'
-
-// In-memory store seeded from the mock data. It lives on globalThis so dev-mode
-// module reloads do not reset it, but it is per server instance and is lost on
-// restart, so created runs do not persist (or sync across serverless
-// instances) until a database replaces it.
-const globalStore = globalThis as typeof globalThis & { __merunRuns?: Run[] }
-const store = (globalStore.__merunRuns ??= [...mockRuns])
-
-// No auth yet, so every created run belongs to the first seeded user.
-const currentUser = store[0].user
 
 export type ListResult =
   | { ok: true; items: Run[]; nextCursor: string | null }
@@ -116,8 +105,36 @@ export async function userExists(username: string): Promise<boolean> {
   return data.length > 0
 }
 
-export function createRun(input: NewRun): Run {
-  const run: Run = { id: crypto.randomUUID(), user: currentUser, ...input }
-  store.push(run)
-  return run
+// TEMPORARY MOCK: there is no auth yet, so every new run is attributed to the
+// abel profile. Delete this function when auth is built; createRun will then
+// take the profile id from the current session.
+async function currentProfileId(): Promise<string> {
+  const { data, error } = await getSupabase()
+    .from('profiles')
+    .select('id')
+    .eq('username', 'abel')
+    .maybeSingle()
+  if (error) throw new Error(`Could not look up the current profile: ${error.message}`)
+  if (!data) throw new Error('The abel profile does not exist.')
+  return data.id
+}
+
+export async function createRun(input: NewRun): Promise<Run> {
+  const { data, error } = await getSupabase()
+    .from('runs')
+    .insert({
+      profile_id: await currentProfileId(),
+      title: input.title,
+      distance_km: input.distanceKm,
+      duration_sec: input.durationSec,
+      date: input.date,
+      location: input.location,
+      notes: input.notes ?? null,
+    })
+    .select(
+      'id, title, distance_km, duration_sec, date, location, notes, profiles!inner(id, name, username, avatar_url)',
+    )
+    .single()
+  if (error) throw new Error(`Could not create run: ${error.message}`)
+  return toRun(data)
 }

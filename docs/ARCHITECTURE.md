@@ -4,10 +4,10 @@
 
 ```
 browser                                          server
-Feed ─► useRuns ─► lib/api.ts ── GET /api/runs ──► Route Handler ─► store (in memory)
- │                     │                                                  ▲
- │                     └─ lib/parse.ts (validates the response)           │
- ▼                                                                  seed.json
+Feed ─► useRuns ─► lib/api.ts ── GET /api/runs ──► Route Handler ─► store (Supabase)
+ │                     │
+ │                     └─ lib/parse.ts (validates the response)
+ ▼
 FeedCard (run) × N ─► lib/format.ts (display + spoken text)
 ```
 
@@ -95,10 +95,13 @@ cached.
 - Errors share one shape: `{ error: { code, message, fields? } }`. `fields`
   maps input names to messages. Codes: `invalid_json` (400), `invalid_query`
   (400), `invalid_cursor` (400), `validation_failed` (422), `not_found` (404).
-- Storage is an in-memory array seeded from `runs.json`. It resets when the
-  server restarts and is not shared between serverless instances, so created
-  runs are not durable yet.
-- There is no auth. Created runs belong to the first seeded user.
+- Storage is Supabase (`runs` and `profiles` tables), read and written only by
+  the server with the secret key. `getRun` returns 404 for an id that is not a
+  UUID instead of letting Postgres fail.
+- There is no auth. `createRun` looks up the `abel` profile id
+  (`currentProfileId` in `store.ts`) and inserts the run with it. This is a
+  temporary mock: it is deleted when auth is built and the id comes from the
+  session.
 
 ## Types (`src/features/runs/types.ts`)
 
@@ -176,8 +179,9 @@ add a spoken counterpart if the value appears in the UI.
   role or label like a user would, and replace `fetch` with `vi.stubGlobal`.
   `server-only` is aliased to the package's own `empty.js` (the file Next.js
   picks for server code); without it Vitest loads the default file, which
-  throws. `handlers.test.ts` clears `globalThis.__merunRuns` and
-  resets modules before each test so the in-memory store starts from the seed.
+  throws. `handlers.test.ts` still clears `globalThis.__merunRuns`, which the
+  store no longer uses, and its handler tests need Supabase (see Known gaps in
+  AGENTS.md).
   `formatDate` tests assert shape, not text, because output depends on locale.
 - `oxlint` with the `react`, `typescript`, `oxc` and `jsx-a11y` plugins
   (`.oxlintrc.json`).

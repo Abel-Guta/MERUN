@@ -19,8 +19,8 @@ rather than fail.
 |---|---|
 | Run feed with run cards | Available, loaded from the runs API |
 | Logging a new run | Planned |
-| Runs API (list, read, create) | Available, stored in memory |
-| Authentication, database persistence | Not started |
+| Runs API (list, read, create) | Available, stored in Supabase |
+| Authentication | Not started (new runs belong to the `abel` profile) |
 
 ### Features
 
@@ -86,5 +86,4 @@ docs/                architecture, accessibility, changelog
 ## Roadmap
 
 - Form to log a new run
-- Database persistence for runs (the API currently stores them in memory)
 - Tests for the formatting helpers
