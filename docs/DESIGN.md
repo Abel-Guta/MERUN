@@ -5,138 +5,143 @@ Read it before changing the look of anything. Append to it after every design
 pass. Project rules (accessibility, plain co-located CSS, no UI library) live in
 [AGENTS.md](../AGENTS.md) and win over anything here.
 
-Status: planned, not built. Tokens below are the target for the design
-foundation work; none are in the code yet.
+Status: built. The landing page (`/`) and the feed (`/feed`) share the system
+below.
 
 ## Brief
 
-- **Subject:** a run log for people who run in Addis Ababa and want to see what
-  their friends ran.
-- **Audience:** runners on a phone, usually just after a run, with a few
-  seconds. They know distance and pace already.
-- **Primary job:** read a friend's run at a glance (how far, how long, how
-  fast), then want to log their own.
-- **Direction from the owner:** futuristic, modern, a warrior-game feel.
-- **Source material:** the highlands at night (Entoto eucalyptus forest) and
-  Ethiopian warrior heritage, expressed as forest black, armour gold and blood
-  red. These are also the flag's hues; the sources are the forest, metal and
-  blood, and the owner can veto the echo.
+- **Subject:** a run log, with a feed of what everyone ran. The setting is the
+  Addis Ababa highlands (the Entoto ridge), used for the art and the example
+  data; the copy does not claim to be only for one city.
+- **Audience:** runners, on a phone as often as a desktop, who know distance
+  and pace already.
+- **Primary job:** the landing page makes someone want to open the feed; the
+  feed lets them read a run at a glance.
+- **Direction from the owner:** an epic, majestic, sci-fi warrior-game look at
+  cinema scale, drawn in SVG and CSS (no photographs).
 
 ## Lineage
 
-Game HUD and RPG character-sheet interfaces. Moves borrowed:
+Game-trailer title design and HUD overlays. Moves borrowed:
 
-1. Clipped-corner panels (chamfers) in place of rounded corners.
-2. Segmented meters: a value is also shown as a row of ticks.
-3. A dark ground, layered by tone with thin rules, and one metallic accent.
+1. Type at poster scale: wide, heavy, all-caps headlines.
+2. HUD overlays on the landscape: a dotted dial ring, a thin ring, km marks.
+3. Flat tonal layers and one light source (the gold sun), with no gradients,
+   glows or glass.
 
 ## Concept
 
-Every run is a mission card you can read in one look.
+The horizon is a route. The hero is the Entoto ridgeline drawn as a run's
+elevation profile, with a gold route line along it and a km mark for every
+kilometre, ending in a flag.
 
-## Tokens (target)
+## Tokens
 
-Existing variable names are kept so components keep working; values change and
-new names are added.
+All in `src/app/globals.css`.
 
 | Token | Value | Role |
 |---|---|---|
-| `--color-bg` | `#0C1512` | page ground (green-tinted black) |
-| `--color-surface` | `#15211C` | panels and cards |
-| `--color-border` | `#2C3B35` | thin rules |
-| `--color-text` | `#E8EBE4` | body text |
-| `--color-text-muted` | `#9FB0A6` | secondary text (contrast to verify) |
-| `--color-accent` | `#F5C400` | distance, key numbers, focus ring, main button |
-| `--color-danger` | `#D9382B` | errors only |
-| `--color-focus` | `#F5C400` | keyboard focus ring |
+| `--color-bg` | `#0c1512` | page ground (green-tinted black); also the foreground ridge, so the hero meets the page with no seam |
+| `--color-surface` | `#15211c` | panels and cards |
+| `--color-border` | `#2c3b35` | thin rules and unlit ticks; decorative only |
+| `--color-text` | `#e8ebe4` | body text |
+| `--color-text-muted` | `#9fb0a6` | secondary text (8.2:1 on bg, 7.3:1 on surface) |
+| `--color-accent` | `#f5c400` | the sun, the route, distance numerals, buttons, focus ring |
+| `--color-danger` | `#d9382b` | error fills and borders only; fails AA as text |
+| `--color-danger-text` | `#ec5a4e` | error text (5.4:1 on bg, 4.85:1 on surface) |
+| `--color-focus` | `#f5c400` | keyboard focus ring |
+| `--color-ridge-far`, `--color-ridge-mid` | `#1c2f26`, `#132319` | the two ridge layers in the hero |
 
-Proportions: about 70 ground and panels, 18 text, 8 gold, 2 red, 2 rules.
-
-Every text and background pair must pass WCAG AA before it is used. Gold is a
-fill or text on dark only, never text on a light ground. Red is for errors only
-and is never the only signal (pair it with text).
+Spacing: 4, 8, 12, 16, 24, 32, 48, 64 px (`--space-1` to `--space-16`).
+Type scale: ratio 1.25 from 16px (`--text-xs` to `--text-3xl`). Everything else
+is derived from these; the only raw sizes are layout widths and the 4.5rem
+distance numeral.
 
 ### Type
 
-- One family: **Saira** (Google Fonts, variable weight and width), loaded with
-  `next/font` so it is self-hosted at build time.
-- Heavy and condensed for numerals; normal width for text.
-- Scale: ratio 1.25 on a 16px base: 12.8, 16, 20, 25, 31, 39, 49 px.
-- Baseline: 4px; body line-height 24px.
-- Tabular numerals for all data. To verify that Saira ships `tnum`; if not,
-  choose another face before building.
-- Amharic can fall back to Noto Sans Ethiopic when it is needed.
+One family, **Saira** (variable weight 100-900 and width 50-125), loaded with
+`next/font/google`, so it is self-hosted at build time (a build needs a network
+connection). It has tabular numerals, which `body` turns on.
 
-### Spacing
-
-One scale on the 4px baseline: 4, 8, 12, 16, 24, 32, 48, 64.
-
-## Layout
-
-Mobile first, designed at 360px. Single column of mission cards, max width
-about 560px, centered on wide screens.
-
-```
-┌──────────────────────────╲
-▌ Morning easy run          ╲
-▌ Abel Guta · @abel          │
-▌ Nov 11 · Addis Ababa       │
-▌                            │
-▌ 5.2 km     ▮▮▮▮▮▯▯▯▯▯      │
-▌ 28:05      5:24 /km        │
-▌ Legs felt fresh.           │
-└──────────────────────────┘
-```
-
-Alternatives considered: plain timetable rows with a plate (the earlier
-road-sign plan), and a feed of plates only with details behind a tap. The card
-wins because it matches the direction and keeps the existing semantic markup.
+- Display headlines: width 125%, weight 800, all caps (CSS `text-transform`).
+- Numerals and the wordmark: width 70%, weight 800.
+- Text: normal width.
 
 ## The one bold move
 
-The mission card: a clipped top-right corner, a gold edge on the left, and the
-distance as a large condensed numeral above a row of km ticks (one tick per
-kilometre, capped at 10). The numeral is real text; the ticks are decorative
-and hidden from assistive technology.
+The route. In the hero the gold route line draws itself across the ridge and
+the km marks light up in order, ending at the flag. It is the only motion on
+the page. Under `prefers-reduced-motion` the finished art shows at once. The
+same idea carries into the cards: the distance is the large gold numeral, with
+one tick per whole kilometre (capped at ten) beneath it.
 
-## Details
+## Components
 
-- Radius 0 with clipped corners. Avatars stay round because they are people.
+- **Hero:** headline left-aligned over the art, one call to action. Not a
+  centred hero.
+- **Mission card:** a gold 4px left edge, a clipped top-right corner (32px),
+  radius 0. Used by the feed card and the landing's example run.
+- **Buttons:** square, gold. The primary call to action is a solid gold fill;
+  feed buttons are gold-outlined. The faint rule colour is never a control's
+  only boundary.
+- **Errors:** red text on a panel with a red left edge.
+- **Skeleton:** same shape as a card, so the feed does not jump.
+- **Annotated run:** the example card with leader lines to notes laid out down
+  its height, in the order they appear on the card.
+
+## Rules we keep
+
 - Flat fills and thin rules. No glows, gradients, glass or shadows.
-- Labels in sentence case. Only the wordmark is in capitals.
-- Motion: at most one moment, a quick clip-path wipe as cards load, skipped
-  under `prefers-reduced-motion`. Optional.
-- Copy: plain and specific, no marketing text.
-- Dark only for now. No light mode.
-
-## Constraints from the project rules
-
-- Plain CSS, one co-located file per component, colours only from the variables
-  in `src/app/globals.css`.
-- `clip-path` clips outlines. The clipped shape goes on a background layer so
-  the keyboard focus ring stays visible.
-- Accessibility first: semantic HTML, visible focus, labels, contrast, reduced
-  motion. See [ACCESSIBILITY.md](ACCESSIBILITY.md).
-- Not part of this design: levels, XP, ranks or streaks. The data has only
-  distance, time and pace. Those would be features, decided separately.
+- Radius 0, with clipped corners. Avatars stay round because they are people.
+- Sentence case for labels; all caps only for display headlines.
+- Dark only. No light mode.
+- Honest copy: nothing on the page promises a feature the app does not have
+  (no sign-up, likes or follows). The example run says it is not live data.
+- `clip-path` clips outlines, so nothing focusable sits in a clipped corner.
+  Forced-colors mode gets a real outline and no clip.
+- The hero artwork is `aria-hidden`; every fact on the page is also text.
 
 ## Rejected
 
-- **Road-sign plan** (white ground, yellow plate, wayfinding lineage): replaced
-  when the owner asked for a futuristic warrior-game look.
-- **Track red** accent: drifts toward the terracotta default.
-- **Orbitron, Chakra Petch**: the default sci-fi faces.
-- **Cyan, purple or neon palettes, glows and glass**: the generic game look.
-- **Inter, Roboto, system fonts**: the personality-free default.
+- **Road-sign plan** (white ground, yellow plate): replaced by the owner's
+  game-style direction.
+- **First dark restyle** (the plain list of cards with a gold edge, no
+  atmosphere): the owner called it weak. It became the base for the landing
+  page and the scaled-up feed.
+- **Cyan, purple or neon palettes; Orbitron and Chakra Petch:** the generic
+  game look.
+- **Track red:** drifts toward a terracotta default.
+- **Centred hero, three icon cards, a phone mockup, hero stat blocks:** generic
+  marketing templates.
+- **Photographs:** none were available; the art is generated SVG.
 
 ## Sameness test
 
-A generic game-style app would fit cyan, purple and Orbitron. This plan fits
-Addis: forest black, gold and red, from the setting. Passed.
+A generic fitness landing page has a centred hero and three icon cards. This
+one has a route drawn along the Entoto ridge, an annotated card and the
+spoken-number story as its feature. Passed.
+
+## Notes for next time
+
+- The artwork is data in `src/features/landing/lib/hero-art.ts`: three ridge
+  paths, the route and the km marks, drawn in a 1440 x 600 box. The peaks rise
+  to the right, behind the sun, and stay low under the headline so the text
+  stays readable. Edit the numbers, or regenerate them with the same idea.
+- The landing's example card duplicates the feed card's look in its own CSS,
+  because features may not import each other. If a third place needs the card,
+  move it to `shared/`.
+- Checked with screenshots at 360px and 1440px and an axe audit (WCAG 2 A, AA
+  and best practice: no violations on `/` and `/feed`). The audit is not in
+  `npm test`.
+- The skeleton is a fixed 17.5rem tall, a guess at an average card.
+- Open ideas, not built: a log-a-run form (a feature), levels or streaks (a
+  feature), a light theme, Amharic with a Noto Sans Ethiopic fallback.
 
 ## Log
 
-- **Plan agreed (design foundation):** brief, lineage, tokens, type and the
-  mission card agreed with the owner. Next: tokens and font, header and shell,
-  `FeedCard`, `Feed` states, then screenshots, a critique pass and an update
-  here.
+- **Design foundation:** dark tokens, Saira, header, mission card, feed states.
+- **Landing and feed redo:** landing page at `/`, feed moved to `/feed`, hero
+  art, annotated run, accessibility section, feed matched to the landing's
+  scale. Fixed along the way: a seam where the hero met the page, notes that
+  did not point at the card, squashed labels, a header rule wider than the
+  content.

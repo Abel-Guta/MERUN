@@ -17,13 +17,16 @@ rather than fail.
 
 | Area | State |
 |---|---|
-| Run feed with run cards | Available, loaded from the runs API |
+| Landing page | Available at `/` |
+| Run feed with run cards | Available at `/feed`, loaded from the runs API |
 | Logging a new run | Planned |
 | Runs API (list, read, create) | Available, stored in Supabase |
 | Authentication | Not started (new runs belong to the `abel` profile) |
 
 ### Features
 
+- Landing page with an illustrated hero, an annotated example run and the
+  accessibility story
 - Feed of runs with user details, location, notes and run statistics
 - Pace calculated from distance and time
 - Screen-reader-friendly output, such as "5 minutes 24 seconds per kilometer"
@@ -52,16 +55,17 @@ The dev server prints the local URL.
 | `npm run build` | Type-check and build for production |
 | `npm run lint` | Run oxlint, including accessibility rules |
 | `npm run preview` | Serve the production build locally (run `build` first) |
-
-There is no test runner yet.
+| `npm test` | Run the Vitest tests |
 
 ## Project structure
 
 ```
 src/
-  app/               layout (skip link, header, main), home page, global CSS
-  features/runs/     the runs feature: components, formatting helpers, types,
-                     mock data and server code (API handlers, validation, store)
+  app/               root layout, the landing (`/`) and feed (`/feed`) routes,
+                     global CSS
+  features/landing/  the landing page: sections and the hero artwork
+  features/runs/     the runs feature: components, formatting helpers, types
+                     and server code (API handlers, validation, store)
   shared/            code shared by several features (HTTP helpers)
 docs/                architecture, accessibility, changelog
 ```
@@ -89,4 +93,3 @@ docs/                architecture, accessibility, changelog
 ## Roadmap
 
 - Form to log a new run
-- Tests for the formatting helpers

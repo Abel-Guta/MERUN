@@ -5,21 +5,21 @@ follow the links for detail.
 
 ## Project
 
-MERUN is a run-logging MVP. Current scope: a feed of run cards (who ran, what
-they ran). The home feed fetches runs from the runs API under `/api` in the
-browser. Runs are stored in Supabase (Postgres), reached only from the server
+MERUN is a run-logging MVP. Current scope: a landing page at `/` and a feed of
+run cards (who ran, what they ran) at `/feed`. The feed fetches runs from the
+runs API under `/api` in the browser. Runs are stored in Supabase (Postgres), reached only from the server
 through the secret key: list (feed, cursor pagination, per-user filter), get,
-create and the user lookup. The client does not call get or create yet. There is
-one page (`/`) and no auth; `createRun` attributes every new run to the `abel`
+create and the user lookup. The client does not call get or create yet. There
+are two pages, the landing page and the feed, and no auth; `createRun` attributes every new run to the `abel`
 profile through a temporary mock (`currentProfileId` in `store.ts`) that is
 deleted once OAuth exists and the profile id comes from the session.
 
 Stack: Next.js 16 (App Router), React 19, TypeScript, plain CSS, oxlint,
 Vitest. No UI library.
 
-Rendering strategy (owner decision): public pages will be static or
-server-rendered. The personalized home feed is client-rendered: `Feed` is a
-client component that will own browser-side fetching. Next.js also hosts the
+Rendering strategy (owner decision): public pages are static or
+server-rendered; the landing page is static. The personalized feed is
+client-rendered: `Feed` is a client component that owns browser-side fetching. Next.js also hosts the
 API (Route Handlers) in the same project; keep server logic in plain modules so
 it can be split out later if the app outgrows one project.
 
@@ -42,11 +42,18 @@ all pass with no warnings. TypeScript runs in strict mode (`"strict": true` in
 ```
 src/
   app/                       routing only; no logic
-    layout.tsx               root shell: skip link, header, <main>, metadata
-    page.tsx                 home route: renders <Feed>
+    layout.tsx               root shell: skip link, font, metadata
+    (marketing)/             route group for `/`: layout (site bar, <main>, footer)
+                             and page.tsx rendering <Landing>
+    (app)/                   route group for the app: layout (header, <main>) and
+                             feed/page.tsx rendering <Feed> at `/feed`
     globals.css              global styles, CSS variables, utilities
     api/                     one-line route files that re-export feature handlers
   features/
+    landing/                 the marketing page (static, server components)
+      components/            Landing, Hero, HeroArt, AnnotatedRun, Accessible,
+                             Closing (each with a co-located .css file)
+      lib/hero-art.ts        the hero artwork as data (ridges, route, km marks)
     runs/                    one folder per feature
       index.ts               public, client-safe surface
       components/            Feed, FeedCard (each with a co-located .css file)
@@ -163,6 +170,9 @@ Tracked here so nobody has to rediscover them.
   check markup and roles in jsdom, not screen reader output.
 - The feed's API response is validated (`lib/parse.ts`); the store trusts rows
   only after `toRun` has checked them.
+- The landing page tests check headings, links and text in jsdom. Nothing
+  tests the artwork or the load animation; they were checked by eye and with an
+  axe audit (no violations on `/` and `/feed`), which is not part of `npm test`.
 - The feed has no data-fetching library, caching or revalidation, and the
   loading, error and load-more states have not been tested with a screen
   reader.
