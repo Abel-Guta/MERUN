@@ -91,8 +91,18 @@ export async function listRuns(options: {
   return { ok: true, items, nextCursor }
 }
 
-export function getRun(id: string): Run | undefined {
-  return store.find((run) => run.id === id)
+export async function getRun(id: string): Promise<Run | undefined> {
+  // A non-UUID id makes Postgres throw, which would surface as a 500 instead of a 404.
+  if (!UUID.test(id)) return undefined
+  const { data, error } = await getSupabase()
+    .from('runs')
+    .select(
+      'id, title, distance_km, duration_sec, date, location, notes, profiles!inner(id, name, username, avatar_url)',
+    )
+    .eq('id', id)
+    .maybeSingle()
+  if (error) throw new Error(`Could not get run: ${error.message}`)
+  return data ? toRun(data) : undefined
 }
 
 export async function userExists(username: string): Promise<boolean> {

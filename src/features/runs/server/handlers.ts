@@ -48,7 +48,7 @@ export async function getRunHandler(
   { params }: { params: Promise<{ id: string }> },
 ) {
   const { id } = await params
-  const run = getRun(id)
+  const run = await getRun(id)
   if (!run) return errorResponse(404, 'not_found', 'Run not found.')
   return Response.json(run)
 }
