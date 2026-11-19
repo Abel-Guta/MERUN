@@ -135,3 +135,26 @@ main:focus {
     scroll-behavior: auto !important;
   }
 }
+
+.site-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: var(--space-6) var(--space-4) 0;
+}
+
+.site-bar__mark {
+  color: var(--color-accent);
+  font-size: var(--text-lg);
+  font-stretch: 70%;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-decoration: none;
+}
+
+.site-bar__link {
+  color: var(--color-text);
+  font-weight: 700;
+}

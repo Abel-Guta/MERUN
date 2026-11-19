@@ -1,0 +1,46 @@
+.hero {
+  position: relative;
+  min-height: min(100svh, 52rem);
+  overflow: hidden;
+}
+
+.hero__copy {
+  position: relative;
+  z-index: 1;
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: clamp(var(--space-8), 9vh, var(--space-16)) var(--space-4) 0;
+}
+
+.hero__title {
+  max-width: 11ch;
+  margin: 0;
+  font-size: clamp(2.25rem, 8.5vw, 6.5rem);
+  font-stretch: 125%;
+  font-weight: 800;
+  line-height: 0.95;
+  text-transform: uppercase;
+  text-wrap: balance;
+}
+
+.hero__lead {
+  max-width: 34rem;
+  margin: var(--space-6) 0 var(--space-8);
+  font-size: var(--text-md);
+}
+
+.hero__cta {
+  display: inline-block;
+  padding: var(--space-3) var(--space-8);
+  background: var(--color-accent);
+  color: var(--color-bg);
+  font-size: var(--text-md);
+  font-weight: 800;
+  text-decoration: none;
+  border: 2px solid var(--color-accent);
+}
+
+.hero__cta:hover {
+  background: transparent;
+  color: var(--color-accent);
+}
