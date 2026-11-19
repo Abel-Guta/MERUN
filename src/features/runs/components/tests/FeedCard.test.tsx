@@ -40,6 +40,19 @@ describe('FeedCard', () => {
     )
   })
 
+  it('shows one decorative tick per whole kilometre, hidden from assistive technology', () => {
+    const { container } = render(<FeedCard run={run} />)
+    const ticks = container.querySelector('.feed-card__ticks') as HTMLElement
+    expect(ticks.getAttribute('aria-hidden')).toBe('true')
+    expect(ticks.children).toHaveLength(10)
+    expect(ticks.querySelectorAll('.feed-card__tick--on')).toHaveLength(5)
+  })
+
+  it('shows no filled ticks for a bad distance', () => {
+    const { container } = render(<FeedCard run={{ ...run, distanceKm: NaN }} />)
+    expect(container.querySelectorAll('.feed-card__tick--on')).toHaveLength(0)
+  })
+
   it('keeps the date machine-readable', () => {
     const { container } = render(<FeedCard run={run} />)
     expect(container.querySelector('time')?.getAttribute('dateTime')).toBe(run.date)

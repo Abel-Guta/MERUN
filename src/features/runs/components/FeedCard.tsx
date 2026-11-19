@@ -8,6 +8,8 @@ import {
   formatDistance,
   formatDuration,
   formatPace,
+  kmTicks,
+  MAX_KM_TICKS,
   paceLabel,
 } from '../lib/format'
 import './FeedCard.css'
@@ -48,7 +50,18 @@ export function FeedCard({ run }: { run: Run }) {
       <dl className="feed-card__stats">
         <div>
           <dt>Distance</dt>
-          <dd aria-label={distanceLabel(run.distanceKm)}>{formatDistance(run.distanceKm)}</dd>
+          <dd aria-label={distanceLabel(run.distanceKm)}>
+            {formatDistance(run.distanceKm)}
+            {/* Decorative: the distance is already stated as text above */}
+            <span className="feed-card__ticks" aria-hidden="true">
+              {Array.from({ length: MAX_KM_TICKS }, (_, i) => (
+                <span
+                  key={i}
+                  className={i < kmTicks(run.distanceKm) ? 'feed-card__tick feed-card__tick--on' : 'feed-card__tick'}
+                />
+              ))}
+            </span>
+          </dd>
         </div>
         <div>
           <dt>Time</dt>

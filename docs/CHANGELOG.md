@@ -400,3 +400,36 @@ Entry format: **What** (the change), **Where** (files), **Why** (the reason).
   exception.
 - **Noted, not changed:** `README.md` still says "There is no test runner yet"
   and lists "mock data" in the project structure; both are out of date.
+
+## 21. Design foundation, landing page and feed redo
+
+- **What:** A dark, game-style design system and a new landing page.
+  - Tokens and font: a forest-night, gold and red palette, a spacing scale, a
+    type scale and Saira (with the width axis), in `globals.css` and the root
+    layout.
+  - Landing page at `/`: an illustrated hero (SVG ridgeline, sun and a route
+    that draws itself, skipped under reduced motion), an annotated example run,
+    an accessibility section built from the real spoken strings, a closing call
+    to action and a footer.
+  - The feed moved to `/feed` and was restyled to match: a mission card with a
+    gold edge, a clipped corner, a large distance numeral and a km tick meter
+    (`kmTicks` in `lib/format.ts`), plus the loading, empty, error and
+    load-more states.
+  - Routes use two route groups, `(marketing)` and `(app)`, under one root
+    layout.
+- **Where:** `src/app/` (layouts, routes, `globals.css`),
+  `src/features/landing/` (new), `src/features/runs/components/` (card and feed
+  CSS, `FeedCard.tsx`), `src/features/runs/lib/format.ts` and its tests,
+  `docs/DESIGN.md` (new), `AGENTS.md`, `README.md`, `docs/ARCHITECTURE.md`.
+- **Why:** The owner wanted a much stronger, majestic look and a marketing
+  page, and a plain restyle of the feed was not enough.
+- **Verified:** `npm run build`, `npm run lint` and `npm test` (186 pass);
+  screenshots at 360px and 1440px; an axe audit (WCAG 2 A and AA, best
+  practice) with no violations on `/` and `/feed`; the load animation and the
+  reduced-motion state checked by screenshot.
+- **Noted, not changed:** the `TEST createRun check` row is still in Supabase.
+  The landing's example card duplicates the feed card's styling by design (see
+  `docs/DESIGN.md`). Nothing tests the artwork.
+- **Also fixed:** the README said there was no test runner, mentioned mock data
+  and listed formatting-helper tests as a roadmap item; all three were out of
+  date.

@@ -11,16 +11,21 @@ Feed ─► useRuns ─► lib/api.ts ── GET /api/runs ──► Route Handl
 FeedCard (run) × N ─► lib/format.ts (display + spoken text)
 ```
 
-The page HTML is prerendered with the loading state; the browser then fetches
-the first page of runs. `app/layout.tsx` wraps every route with the skip link,
-header and `<main>`.
+The feed page (`/feed`) is prerendered with the loading state; the browser then
+fetches the first page of runs. The landing page (`/`) is fully static and
+fetches nothing. `app/layout.tsx` wraps every route with the skip link; the
+route groups `(marketing)` and `(app)` add their own header and `<main>`.
+The two groups share one root layout, so moving between them is a normal
+client navigation.
 
 ## Rendering
 
 - The app uses the Next.js App Router. `layout.tsx` and `page.tsx` are server
   components and are prerendered at build time.
-- Public pages (planned) will be static or server-rendered.
-- The home feed is client-rendered. `Feed` is marked `'use client'` because it
+- Public pages are static or server-rendered. The landing page (`/`) is static
+  and is made only of server components; its artwork is inline SVG and its one
+  animation is CSS.
+- The feed (`/feed`) is client-rendered. `Feed` is marked `'use client'` because it
   owns browser-side fetching (`useRuns`); `FeedCard` has no interactivity and has no
   directive, but it ships in the client bundle because `Feed` imports it. Put
   `'use client'` on the smallest component that needs state, effects or event
@@ -118,13 +123,18 @@ seconds. Pace is never stored; it is derived from the two.
 
 | Component | Renders | Notes |
 |---|---|---|
-| `RootLayout` (`app/layout.tsx`) | Skip link, `<header>` with `<h1>`, `<main id="main">` | `main` has `tabIndex={-1}` so the skip link can move focus into it |
-| `HomePage` (`app/page.tsx`) | `<Feed />` | No data passed; the feed fetches its own |
+| `RootLayout` (`app/layout.tsx`) | Skip link, then the route group's layout | Loads the font and sets the page metadata |
+| `MarketingLayout` (`app/(marketing)/layout.tsx`) | `<header>` with the wordmark and a `Feed` link, `<main id="main">`, `<footer>` | `main` has `tabIndex={-1}` so the skip link can move focus into it |
+| `HomePage` (`app/(marketing)/page.tsx`) | `<Landing />` | Static. The `<h1>` is the hero headline, so the header has none |
+| `AppLayout` (`app/(app)/layout.tsx`) | `<header>` with the wordmark as the `<h1>`, `<main id="main">` | Same `main` focus rule |
+| `FeedPage` (`app/(app)/feed/page.tsx`) | `<Feed />` | No data passed; the feed fetches its own |
+| `Landing` | Hero, `AnnotatedRun`, `Accessible`, `Closing` sections | Each section is a `<section>` named by its `<h2>`. The hero artwork is `aria-hidden`; the example run is labelled as not live data |
 | `Feed` | `<section>` labelled by an `<h2>` with `aria-busy`, a `<ul>` of cards | Client component. States: loading (skeletons, hidden "Loading runs" status), error (`role="alert"` and a "Try again" button), empty (`<output>`), ready, plus a "Load more runs" button |
 | `FeedCard` | One `<article>` labelled by its `<h3>` title | Header (avatar, name, username, date, location), notes, stats `<dl>` |
 
-Cards use `<h3>` because the page outline is `h1` (app) → `h2` (feed) → `h3`
-(run). Keep that nesting if you add sections.
+Cards use `<h3>` because the feed page outline is `h1` (wordmark) → `h2` (feed)
+→ `h3` (run). On the landing page the `<h1>` is the headline and each section
+is an `<h2>`. Keep that nesting if you add sections.
 
 ## Formatting helpers (`src/features/runs/lib/format.ts`)
 

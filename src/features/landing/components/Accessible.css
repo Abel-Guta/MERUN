@@ -1,0 +1,96 @@
+.accessible {
+  padding-block: var(--space-16);
+  border-top: 1px solid var(--color-border);
+}
+
+.accessible__title {
+  max-width: 12ch;
+  margin: 0 0 var(--space-6);
+  font-size: clamp(1.75rem, 4.5vw, 3.5rem);
+  font-stretch: 125%;
+  font-weight: 800;
+  line-height: 1;
+  text-transform: uppercase;
+  text-wrap: balance;
+}
+
+.accessible__lead {
+  max-width: 34rem;
+  margin: 0 0 var(--space-12);
+  font-size: var(--text-md);
+}
+
+.accessible__pairs {
+  display: grid;
+  gap: var(--space-4);
+  margin: 0 0 var(--space-12);
+}
+
+.accessible__pair {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-4) var(--space-6);
+  background: var(--color-surface);
+  border-left: 4px solid var(--color-accent);
+}
+
+.accessible__pair dt {
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+}
+
+.accessible__pair dd {
+  margin: 0;
+}
+
+.accessible__tag {
+  display: block;
+  color: var(--color-text-muted);
+  font-size: var(--text-xs);
+  font-stretch: 100%;
+  font-weight: 400;
+}
+
+.accessible__seen {
+  color: var(--color-accent);
+  font-size: var(--text-xl);
+  font-stretch: 70%;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
+.accessible__said {
+  font-size: var(--text-md);
+}
+
+.accessible__habits {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.accessible__habits li {
+  padding-left: var(--space-6);
+  border-left: 2px solid var(--color-accent);
+}
+
+@media (min-width: 56rem) {
+  .accessible__pair {
+    grid-template-columns: 8rem minmax(0, 1fr) minmax(0, 1.4fr);
+    align-items: center;
+    gap: var(--space-6);
+  }
+
+  .accessible__habits {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-4) var(--space-8);
+  }
+}
+
+@media (forced-colors: active) {
+  .accessible__pair {
+    border: 1px solid CanvasText;
+  }
+}
