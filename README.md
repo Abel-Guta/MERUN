@@ -78,6 +78,8 @@ docs/                architecture, accessibility, changelog
 
 - [AGENTS.md](AGENTS.md): rules, conventions and commands for AI agents and
   contributors. Start here if you are about to change code.
+- [CONTRIBUTING.md](CONTRIBUTING.md): setup, the branch and pull request
+  workflow, and what to check before opening a pull request.
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md): data flow, components and the
   formatting helper contract.
 - [docs/ACCESSIBILITY.md](docs/ACCESSIBILITY.md): checklist for UI changes.
