@@ -1,28 +1,39 @@
 .feed__heading {
-  margin: 0 0 12px;
-  font-size: 1.25rem;
+  margin: 0 0 var(--space-4);
+  font-size: var(--text-md);
+  font-weight: 700;
 }
 
 .feed__list {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--space-4);
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
 .feed__empty {
+  display: block;
+  padding: var(--space-8) 0;
   text-align: center;
   color: var(--color-text-muted);
 }
 
+/* Same shape as a run card, so the page does not jump when runs arrive. */
 .feed__skeleton {
-  height: 168px;
-  border: 1px solid var(--color-border);
-  border-radius: 12px;
+  height: 17.5rem;
   background: var(--color-surface);
+  border-left: 4px solid var(--color-border);
+  clip-path: polygon(0 0, calc(100% - var(--space-6)) 0, 100% var(--space-6), 100% 100%, 0 100%);
   animation: feed-pulse 1.4s ease-in-out infinite;
+}
+
+@media (forced-colors: active) {
+  .feed__skeleton {
+    border: 1px solid CanvasText;
+    clip-path: none;
+  }
 }
 
 @keyframes feed-pulse {
