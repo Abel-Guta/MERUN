@@ -80,6 +80,7 @@ when a second feature needs it.
 | [CONTRIBUTING.md](CONTRIBUTING.md) | You are setting up, opening a branch or a pull request |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | You need the data flow, component responsibilities or the helper contract |
 | [docs/ACCESSIBILITY.md](docs/ACCESSIBILITY.md) | You are writing or reviewing any UI |
+| [docs/DESIGN.md](docs/DESIGN.md) | You are changing how anything looks: colours, type, spacing, layout |
 | [docs/CHANGELOG.md](docs/CHANGELOG.md) | You need to know what changed, where, and why |
 
 ## Rules

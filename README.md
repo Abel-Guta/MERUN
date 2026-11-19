@@ -83,6 +83,7 @@ docs/                architecture, accessibility, changelog
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md): data flow, components and the
   formatting helper contract.
 - [docs/ACCESSIBILITY.md](docs/ACCESSIBILITY.md): checklist for UI changes.
+- [docs/DESIGN.md](docs/DESIGN.md): the design plan, tokens and decisions.
 - [docs/CHANGELOG.md](docs/CHANGELOG.md): what changed, where and why.
 
 ## Roadmap
