@@ -107,6 +107,11 @@ main:focus {
   padding-bottom: var(--space-6);
 }
 
+.app__title a {
+  color: inherit;
+  text-decoration: none;
+}
+
 /* The rule lives here, not on the header, so it lines up with the content
    column and not with the header's padding. */
 .app__title {

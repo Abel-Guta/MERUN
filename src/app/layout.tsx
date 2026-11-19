@@ -22,12 +22,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <a className="skip-link" href="#main">
           Skip to main content
         </a>
-        <header className="app__header">
-          <h1 className="app__title">MERUN</h1>
-        </header>
-        <main id="main" className="app" tabIndex={-1}>
-          {children}
-        </main>
+        {children}
       </body>
     </html>
   )
