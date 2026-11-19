@@ -140,14 +140,14 @@ These are decisions the owner has made. Do not reverse them without asking.
 
 Tracked here so nobody has to rediscover them.
 
-- Six tests in `server/tests/handlers.test.ts` (`GET /api/runs` x3,
-  `POST /api/runs`, `GET /api/users/:username/runs` x2) call the real handlers,
-  which now query Supabase, so they fail without database access (Vitest does
-  not load the Supabase env vars). This is a known break until the owner decides
-  between live integration tests and a fake store; the rule that all tests pass
-  before finishing a change is suspended for these. A live POST test would
-  insert a real row each run. `toRun` has its own passing tests; `listRuns`,
-  `getRun`, `createRun` and `userExists` have none.
+- `server/tests/handlers.test.ts` mocks `../store` (`vi.mock`), so it checks
+  only handler logic: status codes, validation, the `Location` header and what
+  the handler passes to the store. Nothing tests the store's Supabase code:
+  ordering, cursor paging with and without the username filter, `ilike`
+  escaping of `_`, `!inner`, the non-UUID check in `getRun`, `createRun` and
+  `userExists`. Live tests need a second Supabase project (a test run against
+  the real one would insert rows); the owner deferred that. `toRun` has its own
+  tests.
 - Tests cover `lib/` (format, parse, api) and `server/` (validate, to-run,
   handlers), and `FeedCard` and `Feed` (loading, error, retry, empty and
   load-more states, via `useRuns`, with `fetch` stubbed). There are no direct

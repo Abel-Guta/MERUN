@@ -366,3 +366,22 @@ Entry format: **What** (the change), **Where** (files), **Why** (the reason).
 - **Noted, not changed:** `server/tests/handlers.test.ts` still has a comment
   about seeded data and clears `globalThis.__merunRuns`; both go when the
   handler tests are reworked.
+
+## 19. Mock the store in the handler tests
+
+- **What:** The handler tests now replace `../store` with `vi.mock`, so they
+  test only handler logic. They no longer need Supabase, and the in-memory
+  reset (`globalThis.__merunRuns`, `vi.resetModules`) is gone. Added checks that
+  the handler passes the right arguments to the store (limit, cursor, username,
+  the validated and trimmed run, the id) and that bad requests never reach it.
+- **Where:** `src/features/runs/server/tests/handlers.test.ts`, `AGENTS.md`
+  (Known gaps), `docs/ARCHITECTURE.md` (testing note).
+- **Why:** Six tests failed because they called the real store, which queries
+  Supabase. A mocked store keeps `npm test` offline and deterministic; the
+  owner chose this for now and deferred live store tests to a second Supabase
+  project.
+- **Removed:** "newest first", cursor pagination, create-then-fetch and
+  case-insensitive username tests. They tested store behavior (SQL), and the
+  old pagination test was already wrong (it assumed the cursor was an id).
+  They are listed as a gap, not covered.
+- **Verified:** `npm test` (162 pass), `npm run lint` and `npm run build` pass.

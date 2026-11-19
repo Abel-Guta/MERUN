@@ -179,9 +179,9 @@ add a spoken counterpart if the value appears in the UI.
   role or label like a user would, and replace `fetch` with `vi.stubGlobal`.
   `server-only` is aliased to the package's own `empty.js` (the file Next.js
   picks for server code); without it Vitest loads the default file, which
-  throws. `handlers.test.ts` still clears `globalThis.__merunRuns`, which the
-  store no longer uses, and its handler tests need Supabase (see Known gaps in
-  AGENTS.md).
+  throws. `handlers.test.ts` replaces `../store` with `vi.mock`, so the real
+  handlers and `validate.ts` run against a fake data layer and no Supabase env
+  vars are needed (store behavior is a known gap in AGENTS.md).
   `formatDate` tests assert shape, not text, because output depends on locale.
 - `oxlint` with the `react`, `typescript`, `oxc` and `jsx-a11y` plugins
   (`.oxlintrc.json`).
