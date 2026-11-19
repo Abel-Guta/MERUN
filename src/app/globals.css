@@ -95,7 +95,7 @@ main:focus {
 
 .app__header,
 .app {
-  max-width: 560px;
+  max-width: 44rem;
   margin: 0 auto;
   padding: 0 var(--space-4);
 }
@@ -121,7 +121,7 @@ main:focus {
   padding-bottom: var(--space-3);
   border-bottom: 1px solid var(--color-border);
   color: var(--color-accent);
-  font-size: var(--text-xl);
+  font-size: var(--text-lg);
   font-weight: 800;
   font-stretch: 70%;
   letter-spacing: 0.04em;

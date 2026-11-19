@@ -1,13 +1,16 @@
 .feed__heading {
-  margin: 0 0 var(--space-4);
-  font-size: var(--text-md);
-  font-weight: 700;
+  margin: 0 0 var(--space-6);
+  font-size: clamp(1.75rem, 5vw, 3rem);
+  font-stretch: 125%;
+  font-weight: 800;
+  line-height: 1;
+  text-transform: uppercase;
 }
 
 .feed__list {
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
+  gap: var(--space-6);
   margin: 0;
   padding: 0;
   list-style: none;
@@ -25,7 +28,7 @@
   height: 17.5rem;
   background: var(--color-surface);
   border-left: 4px solid var(--color-border);
-  clip-path: polygon(0 0, calc(100% - var(--space-6)) 0, 100% var(--space-6), 100% 100%, 0 100%);
+  clip-path: polygon(0 0, calc(100% - var(--space-8)) 0, 100% var(--space-8), 100% 100%, 0 100%);
   animation: feed-pulse 1.4s ease-in-out infinite;
 }
 
