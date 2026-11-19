@@ -385,3 +385,18 @@ Entry format: **What** (the change), **Where** (files), **Why** (the reason).
   old pagination test was already wrong (it assumed the cursor was an id).
   They are listed as a gap, not covered.
 - **Verified:** `npm test` (162 pass), `npm run lint` and `npm run build` pass.
+
+## 20. Branch and pull request workflow, contribution guide
+
+- **What:** New rule 7 in AGENTS.md: every change goes on a branch, through a
+  pull request and a merge, never directly on `main`. New `CONTRIBUTING.md`
+  with setup, the workflow (squash merge, Conventional Commit PR titles), the
+  pre-PR checks and what a PR should say.
+- **Where:** `AGENTS.md` (rule 7, documentation map), `CONTRIBUTING.md` (new),
+  `README.md` (documentation list).
+- **Why:** The project now has enough structure that unreviewed commits on
+  `main` are a risk. The owner decided on branches and PRs from this point on.
+  The earlier work up to `5e076ff` was committed on `main` as a one-time
+  exception.
+- **Noted, not changed:** `README.md` still says "There is no test runner yet"
+  and lists "mock data" in the project structure; both are out of date.

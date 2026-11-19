@@ -77,6 +77,7 @@ when a second feature needs it.
 
 | File | Read it when |
 |---|---|
+| [CONTRIBUTING.md](CONTRIBUTING.md) | You are setting up, opening a branch or a pull request |
 | [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | You need the data flow, component responsibilities or the helper contract |
 | [docs/ACCESSIBILITY.md](docs/ACCESSIBILITY.md) | You are writing or reviewing any UI |
 | [docs/CHANGELOG.md](docs/CHANGELOG.md) | You need to know what changed, where, and why |
@@ -112,6 +113,12 @@ These are decisions the owner has made. Do not reverse them without asking.
    not bundle unrelated edits, and do not batch a whole feature into one
    update. If a task needs several steps, say what they are, do the first and
    stop. This applies to every agent and session.
+
+7. **Branches and pull requests, never `main`.** Every change is made on a
+   branch (`feat/...`, `fix/...`, `docs/...`, `chore/...`), reviewed in a pull
+   request and merged. Do not commit on `main`. Small steps and one idea per
+   commit still apply on the branch. The owner pushes and merges; do not push
+   or open a pull request without asking.
 
 ## Conventions
 
