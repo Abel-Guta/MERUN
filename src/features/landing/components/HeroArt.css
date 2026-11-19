@@ -33,7 +33,7 @@
 }
 
 .hero-art__near {
-  fill: var(--color-ridge-near);
+  fill: var(--color-bg);
 }
 
 .hero-art__route {
