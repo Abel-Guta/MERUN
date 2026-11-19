@@ -55,7 +55,6 @@ src/
         format.ts            formatting helpers (visual + screen-reader text)
         api.ts, parse.ts     fetch the runs API, validate its response
       types.ts               User and Run types
-      mock-runs.ts, seed.json  mock data, no longer used by the store
       server/                server-only code
         index.ts             public server surface (route handlers)
         handlers.ts, store.ts, to-run.ts, validate.ts
@@ -154,9 +153,8 @@ Tracked here so nobody has to rediscover them.
   load-more states, via `useRuns`, with `fetch` stubbed). There are no direct
   `useRuns` tests, and no test aborts the request on unmount. Component tests
   check markup and roles in jsdom, not screen reader output.
-- `src/features/runs/mock-runs.ts` and `seed.json` are now unused, since the
-  store reads Supabase. Delete them (and the seed note in the docs) in a
-  separate step. The feed's API response is validated (`lib/parse.ts`).
+- The feed's API response is validated (`lib/parse.ts`); the store trusts rows
+  only after `toRun` has checked them.
 - The feed has no data-fetching library, caching or revalidation, and the
   loading, error and load-more states have not been tested with a screen
   reader.

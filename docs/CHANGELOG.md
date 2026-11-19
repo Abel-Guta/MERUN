@@ -355,3 +355,14 @@ Entry format: **What** (the change), **Where** (files), **Why** (the reason).
   `GET` returned it and it led the feed; an invalid body returned 422. `npm
   test`: 6 handler tests fail without Supabase env vars.
 - **Noted, not changed:** `mock-runs.ts` and `seed.json` are now unused.
+
+## 18. Remove the unused mock data
+
+- **What:** Deleted the mock runs module and its JSON seed.
+- **Where:** `src/features/runs/mock-runs.ts` and `seed.json` (removed),
+  `AGENTS.md` (layout and known gaps).
+- **Why:** Nothing imports them since the store moved to Supabase.
+- **Verified:** `npm run build` and `npm run lint` pass.
+- **Noted, not changed:** `server/tests/handlers.test.ts` still has a comment
+  about seeded data and clears `globalThis.__merunRuns`; both go when the
+  handler tests are reworked.
