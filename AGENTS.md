@@ -62,6 +62,7 @@ src/
         format.ts            formatting helpers (visual + screen-reader text)
         api.ts, parse.ts     fetch the runs API, validate its response
         geo.ts               GPS distance: haversine and noise filtering
+        position.ts          boundary: validate a browser GPS position into a Fix
         tracker.ts           run stopwatch as a state machine (reducer)
       types.ts               User and Run types
       server/                server-only code

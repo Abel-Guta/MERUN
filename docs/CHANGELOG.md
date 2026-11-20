@@ -456,3 +456,22 @@ Entry format: **What** (the change), **Where** (files), **Why** (the reason).
   function.
 - **Noted, not changed:** nothing is wired into the UI yet. The accuracy and hop thresholds are untested against real GPS
   data.
+
+## 23. Validate GPS positions at the boundary (branch `feat/run-tracker`)
+
+- **What:** `toFix` turns a browser GPS position (`unknown`) into a typed `Fix`
+  or `null`, checking that latitude, longitude and accuracy are finite and in
+  range. With that boundary in place, `distanceKm` and `totalDistanceKm` now
+  take plain `Point` and `Fix[]` and no longer validate; their garbage-input
+  tests and `toPoint` were removed.
+- **Where:** `src/features/runs/lib/position.ts` (new) and its test,
+  `src/features/runs/lib/geo.ts` and its test, `AGENTS.md` (layout),
+  `docs/ARCHITECTURE.md` (Run tracker section).
+- **Why:** The owner wants defensive checks only where data comes from outside
+  (rule 2). GPS positions are the outside data, so they are checked once, in
+  one place, and the maths after it can trust its input. Accuracy 0 is
+  accepted (the owner's call): dropping odd readings is harder to notice than
+  keeping them.
+- **Noted, not changed:** the hook that calls `watchPosition` and `toFix` does
+  not exist yet. Positions also carry a timestamp that `Fix` ignores until the
+  speed-jump filter is built.

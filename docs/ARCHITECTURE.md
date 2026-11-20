@@ -183,8 +183,11 @@ yet; the hook that feeds it GPS positions is the next step.
   (3) and the fix's own accuracy. Each fix is compared with the last
   *accepted* fix, so a stationary wobble never accumulates while slow real
   movement still does. The thresholds are starting values to tune on real
-  runs. These two take `unknown` and return 0 for bad input, because fixes come
-  from the browser.
+  runs. These two take plain typed `Point` and `Fix[]` and do no validation.
+- `toFix(position)` in `lib/position.ts` is the boundary: it takes the
+  browser's `GeolocationPosition` as `unknown`, checks that latitude, longitude
+  and accuracy are finite and in range, and returns a `Fix` or `null`. Callers
+  drop the `null`s. Accuracy 0 is accepted.
 - `trackerReducer(state, event)` is a state machine: `idle`, `running`,
   `paused`, `finished`, driven by `start`, `pause`, `resume`, `stop`, `reset`.
   Illegal moves return the same state. The state stores banked `elapsedMs` and
