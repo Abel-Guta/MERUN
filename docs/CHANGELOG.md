@@ -433,3 +433,26 @@ Entry format: **What** (the change), **Where** (files), **Why** (the reason).
 - **Also fixed:** the README said there was no test runner, mentioned mock data
   and listed formatting-helper tests as a roadmap item; all three were out of
   date.
+
+## 22. Run tracker logic (branch `feat/run-tracker`)
+
+- **What:** The pure logic for recording a run in the browser.
+  - `distanceKm`: haversine distance between two GPS points.
+  - `totalDistanceKm`: sums a list of GPS fixes, ignoring poor-accuracy fixes
+    (above 30 m) and hops smaller than 3 m or the fix's own accuracy, measured
+    from the last accepted fix.
+  - `trackerReducer` and `elapsedSec`: a stopwatch state machine (idle,
+    running, paused, finished) that does not count paused time and ignores a
+    device clock that moved backwards.
+- **Where:** `src/features/runs/lib/geo.ts`, `src/features/runs/lib/tracker.ts`
+  and their tests in `lib/tests/`, `AGENTS.md` (layout and next-feature notes),
+  `docs/ARCHITECTURE.md` (new "Run tracker" section).
+- **Why:** The owner chose to log runs by tracking them (Start button, GPS
+  distance, device clock) instead of a plain form. The logic is built first as
+  small pure modules so it is easy to test and reuse in a mobile wrapper. GPS
+  is noisy, so unfiltered sums would count standing still as distance.
+- **Noted, not changed:** `AGENTS.md` rule 2 still says every function must
+  distrust its input. The owner has said they want that only where data comes
+  from outside; the wording is left for them to decide. Nothing is wired into
+  the UI yet. The accuracy and hop thresholds are untested against real GPS
+  data.

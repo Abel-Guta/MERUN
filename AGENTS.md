@@ -61,6 +61,8 @@ src/
       lib/                   plain helpers, no React, no server APIs
         format.ts            formatting helpers (visual + screen-reader text)
         api.ts, parse.ts     fetch the runs API, validate its response
+        geo.ts               GPS distance: haversine and noise filtering
+        tracker.ts           run stopwatch as a state machine (reducer)
       types.ts               User and Run types
       server/                server-only code
         index.ts             public server surface (route handlers)
@@ -177,8 +179,14 @@ Tracked here so nobody has to rediscover them.
   loading, error and load-more states have not been tested with a screen
   reader.
 - User avatars load from a remote host (`i.pravatar.cc`).
-- Next planned feature: a form to log a new run (see accessibility notes for
-  forms).
+- Next planned feature: logging a run by tracking it in the browser (Start,
+  pause, Stop; distance from GPS, duration and date from the device clock),
+  then a save form prefilled from the tracker where the user types the title,
+  location name and notes (see accessibility notes for forms). Done so far: the
+  pure logic in `lib/geo.ts` and `lib/tracker.ts`. Not built: the hook that
+  feeds in GPS positions, the save form, the API call and the Start/Stop UI.
+  A web page only gets GPS while it is open with the screen on; background
+  tracking would need a mobile wrapper.
 
 <!-- BEGIN:nextjs-agent-rules -->
 

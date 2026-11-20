@@ -170,6 +170,32 @@ Take `unknown`, narrow with the existing guards (`toSeconds`, `toKm`,
 `toPaceSec`, `toDate`) or add a new guard, return a fallback on failure, and
 add a spoken counterpart if the value appears in the UI.
 
+## Run tracker (`lib/geo.ts`, `lib/tracker.ts`)
+
+Pure logic for recording a run in the browser. Nothing here uses React or
+browser APIs, so it can move into a mobile wrapper unchanged. Nothing calls it
+yet; the hook that feeds it GPS positions is the next step.
+
+- `distanceKm(a, b)` is the haversine distance between two points.
+- `totalDistanceKm(fixes)` sums the hops along a list of fixes
+  (`{ lat, lng, accuracy }`, accuracy in metres). It skips fixes with accuracy
+  above `MAX_ACCURACY_M` (30) and hops shorter than the larger of `MIN_HOP_M`
+  (3) and the fix's own accuracy. Each fix is compared with the last
+  *accepted* fix, so a stationary wobble never accumulates while slow real
+  movement still does. The thresholds are starting values to tune on real
+  runs. These two take `unknown` and return 0 for bad input, because fixes come
+  from the browser.
+- `trackerReducer(state, event)` is a state machine: `idle`, `running`,
+  `paused`, `finished`, driven by `start`, `pause`, `resume`, `stop`, `reset`.
+  Illegal moves return the same state. The state stores banked `elapsedMs` and
+  the `resumedAt` of the current stretch, so paused time is never counted. The
+  caller passes the time in each event (`at`), so the reducer never reads the
+  clock. Parameters are plain types: the hook that calls it is trusted.
+- `elapsedSec(state, now)` gives whole seconds, for display and for the API's
+  `durationSec`.
+- A device clock moved backwards mid-run counts as a zero-length span, so the
+  duration is never negative.
+
 ## Styling
 
 - Global tokens and utilities live in `src/app/globals.css`: color variables,
