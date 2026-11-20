@@ -451,8 +451,8 @@ Entry format: **What** (the change), **Where** (files), **Why** (the reason).
   distance, device clock) instead of a plain form. The logic is built first as
   small pure modules so it is easy to test and reuse in a mobile wrapper. GPS
   is noisy, so unfiltered sums would count standing still as distance.
-- **Noted, not changed:** `AGENTS.md` rule 2 still says every function must
-  distrust its input. The owner has said they want that only where data comes
-  from outside; the wording is left for them to decide. Nothing is wired into
-  the UI yet. The accuracy and hop thresholds are untested against real GPS
+- **Also changed:** `AGENTS.md` rule 2 now asks for defensive code only where
+  data comes from outside the app, as the owner decided, instead of in every
+  function.
+- **Noted, not changed:** nothing is wired into the UI yet. The accuracy and hop thresholds are untested against real GPS
   data.

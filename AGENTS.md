@@ -100,10 +100,15 @@ These are decisions the owner has made. Do not reverse them without asking.
    where HTML falls short, labels on every control. Details in
    [docs/ACCESSIBILITY.md](docs/ACCESSIBILITY.md). `jsx-a11y` lint rules are on
    and must stay clean.
-2. **Functions do not trust their input.** Validating before the call is
-   planned, but every function must still behave correctly when handed bad
-   data: no throws on garbage, no `NaN`/`Infinity`/`Invalid Date` in output.
-   Take `unknown` at boundaries and narrow it. See `src/features/runs/lib/format.ts`.
+2. **Be defensive at boundaries, not everywhere.** A function that receives
+   data from outside the app (API request bodies and responses, browser
+   callbacks such as GPS positions, anything parsed from text) cannot know
+   whether it is valid. It takes `unknown`, narrows it, and must not throw or
+   output `NaN`/`Infinity`/`Invalid Date` on garbage. A function that is only
+   called with values our own typed code produced uses plain types and adds no
+   defensive checks. Before adding a guard, ask whether the data can really
+   come from outside. See `src/features/runs/lib/format.ts` for the boundary
+   style.
 3. **Plain CSS, co-located.** One `.css` file per component, imported by that
    component. Colors come from the CSS variables in `src/app/globals.css`. Do not add
    a CSS framework or UI library without asking.
