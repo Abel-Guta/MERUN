@@ -8,6 +8,7 @@ interface TrackerControlsProps {
   onPause: () => void
   onResume: () => void
   onStop: () => void
+  onReset: () => void
 }
 
 export function TrackerControls({
@@ -16,8 +17,10 @@ export function TrackerControls({
   onPause,
   onResume,
   onStop,
+  onReset,
 }: TrackerControlsProps) {
   const [confirming, setConfirming] = useState(false)
+  const primaryRef = useRef<HTMLButtonElement>(null)
   const stopRef = useRef<HTMLButtonElement>(null)
   const keepRef = useRef<HTMLButtonElement>(null)
   const returnFocus = useRef(false)
@@ -42,7 +45,10 @@ export function TrackerControls({
     }
   }, [confirming])
 
-  if (status === 'finished') return null
+  // The buttons that were focused (End run) are gone once the run is finished.
+  useEffect(() => {
+    if (status === 'finished') primaryRef.current?.focus()
+  }, [status])
 
   if (confirming) {
     return (
@@ -77,16 +83,22 @@ export function TrackerControls({
     idle: { label: 'Start', onClick: onStart },
     running: { label: 'Pause', onClick: onPause },
     paused: { label: 'Resume', onClick: onResume },
+    finished: { label: 'New run', onClick: onReset },
   }[status]
 
   // The primary button stays the same element and only changes its label, so
   // keyboard focus is not lost when Pause becomes Resume.
   return (
     <div className="tracker-controls">
-      <button type="button" className="tracker-controls__primary" onClick={primary.onClick}>
+      <button
+        type="button"
+        className="tracker-controls__primary"
+        ref={primaryRef}
+        onClick={primary.onClick}
+      >
         {primary.label}
       </button>
-      {status !== 'idle' && (
+      {(status === 'running' || status === 'paused') && (
         <button
           type="button"
           className="tracker-controls__stop"

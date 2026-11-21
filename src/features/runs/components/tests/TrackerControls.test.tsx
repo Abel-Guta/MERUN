@@ -6,7 +6,13 @@ import { TrackerControls } from '../TrackerControls'
 afterEach(cleanup)
 
 function setup(status: 'idle' | 'running' | 'paused' | 'finished') {
-  const handlers = { onStart: vi.fn(), onPause: vi.fn(), onResume: vi.fn(), onStop: vi.fn() }
+  const handlers = {
+    onStart: vi.fn(),
+    onPause: vi.fn(),
+    onResume: vi.fn(),
+    onStop: vi.fn(),
+    onReset: vi.fn(),
+  }
   const view = render(<TrackerControls status={status} {...handlers} />)
   return { ...view, handlers }
 }
@@ -74,14 +80,26 @@ describe('TrackerControls', () => {
     expect(handlers.onResume).toHaveBeenCalledTimes(1)
   })
 
-  it('shows no buttons once finished', () => {
-    setup('finished')
-    expect(names()).toEqual([])
+  it('offers only New run once finished', () => {
+    const { handlers } = setup('finished')
+    expect(names()).toEqual(['New run'])
+    fireEvent.click(screen.getByRole('button', { name: 'New run' }))
+    expect(handlers.onReset).toHaveBeenCalledTimes(1)
+  })
+
+  it('moves focus to New run when the run finishes', () => {
+    const noop = vi.fn()
+    const props = { onStart: noop, onPause: noop, onResume: noop, onStop: noop, onReset: noop }
+    const { rerender } = render(<TrackerControls status="running" {...props} />)
+    fireEvent.click(screen.getByRole('button', { name: 'Stop' }))
+    fireEvent.click(screen.getByRole('button', { name: 'End run' }))
+    rerender(<TrackerControls status="finished" {...props} />)
+    expect(document.activeElement).toBe(screen.getByRole('button', { name: 'New run' }))
   })
 
   it('keeps keyboard focus when Pause becomes Resume', () => {
     const noop = vi.fn()
-    const props = { onStart: noop, onPause: noop, onResume: noop, onStop: noop }
+    const props = { onStart: noop, onPause: noop, onResume: noop, onStop: noop, onReset: noop }
     const { rerender } = render(<TrackerControls status="running" {...props} />)
     const button = screen.getByRole('button', { name: 'Pause' })
     button.focus()
