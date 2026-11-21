@@ -1,0 +1,17 @@
+.tracker-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-3) var(--space-4);
+  margin: 0;
+}
+
+.tracker-stats dt {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+.tracker-stats dd {
+  margin: var(--space-1) 0 0;
+  font-size: var(--text-md);
+  font-weight: 700;
+}
