@@ -1,0 +1,36 @@
+.tracker-status {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+  font-weight: 700;
+}
+
+/* A square, like the km ticks. Lit when the run is live or done, hollow when
+   it is waiting. The word carries the meaning; the mark is only a cue. */
+.tracker-status__mark {
+  width: var(--space-3);
+  height: var(--space-3);
+  border: 2px solid var(--color-text-muted);
+}
+
+.tracker-status--running .tracker-status__mark,
+.tracker-status--finished .tracker-status__mark {
+  background: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+.tracker-status--paused .tracker-status__mark {
+  border-color: var(--color-accent);
+}
+
+@media (forced-colors: active) {
+  .tracker-status__mark {
+    border-color: CanvasText;
+  }
+
+  .tracker-status--running .tracker-status__mark,
+  .tracker-status--finished .tracker-status__mark {
+    background: Highlight;
+  }
+}
