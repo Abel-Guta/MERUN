@@ -38,6 +38,22 @@
   background: var(--color-accent);
 }
 
+/* A fieldset brings a border, padding and a minimum width; the question is its
+   legend, which sits outside the button grid. */
+.tracker-controls--confirm {
+  min-inline-size: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.tracker-controls__question {
+  padding: 0;
+  margin-bottom: var(--space-4);
+  font-size: var(--text-lg);
+  font-weight: 800;
+}
+
 @media (min-width: 40rem) {
   .tracker-controls {
     grid-template-columns: 1fr 1fr;

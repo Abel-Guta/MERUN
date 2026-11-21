@@ -25,9 +25,46 @@ describe('TrackerControls', () => {
     const { handlers } = setup('running')
     expect(names()).toEqual(['Pause', 'Stop'])
     fireEvent.click(screen.getByRole('button', { name: 'Pause' }))
-    fireEvent.click(screen.getByRole('button', { name: 'Stop' }))
     expect(handlers.onPause).toHaveBeenCalledTimes(1)
+  })
+
+  it('asks before stopping and does not stop yet', () => {
+    const { handlers } = setup('running')
+    fireEvent.click(screen.getByRole('button', { name: 'Stop' }))
+    expect(screen.getByRole('group', { name: 'End this run?' })).toBeTruthy()
+    expect(names()).toEqual(['Keep going', 'End run'])
+    expect(handlers.onStop).not.toHaveBeenCalled()
+  })
+
+  it('puts focus on the safe choice when asking', () => {
+    setup('running')
+    fireEvent.click(screen.getByRole('button', { name: 'Stop' }))
+    expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Keep going' }))
+  })
+
+  it('stops only after "End run"', () => {
+    const { handlers } = setup('paused')
+    fireEvent.click(screen.getByRole('button', { name: 'Stop' }))
+    fireEvent.click(screen.getByRole('button', { name: 'End run' }))
     expect(handlers.onStop).toHaveBeenCalledTimes(1)
+  })
+
+  it('"Keep going" cancels and returns focus to Stop', () => {
+    const { handlers } = setup('running')
+    fireEvent.click(screen.getByRole('button', { name: 'Stop' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Keep going' }))
+    expect(handlers.onStop).not.toHaveBeenCalled()
+    expect(names()).toEqual(['Pause', 'Stop'])
+    expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Stop' }))
+  })
+
+  it('Escape cancels the question', () => {
+    const { handlers } = setup('running')
+    fireEvent.click(screen.getByRole('button', { name: 'Stop' }))
+    fireEvent.keyDown(window, { key: 'Escape' })
+    expect(handlers.onStop).not.toHaveBeenCalled()
+    expect(names()).toEqual(['Pause', 'Stop'])
+    expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Stop' }))
   })
 
   it('offers Resume and Stop while paused', () => {
