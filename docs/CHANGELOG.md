@@ -475,3 +475,54 @@ Entry format: **What** (the change), **Where** (files), **Why** (the reason).
 - **Noted, not changed:** the hook that calls `watchPosition` and `toFix` does
   not exist yet. Positions also carry a timestamp that `Fix` ignores until the
   speed-jump filter is built.
+
+## 24. GPS watch and tracker hooks (branch `feat/run-tracker`)
+
+- **What:** Two hooks that connect the tracker logic to the browser.
+  - `useGpsWatch(active, onFix)` watches the device position while `active`,
+    validates each position with `toFix`, calls `onFix` with the valid ones, and
+    reports `'unsupported'`, `'denied'` or `'unavailable'`.
+  - `useTracker()` combines `trackerReducer`, per-stretch lists of fixes (so
+    travel while paused is not counted), a one-second clock tick and the GPS
+    watch, and returns the status, distance, duration and the Start, Pause,
+    Resume, Stop and Reset actions.
+- **Where:** `src/features/runs/hooks/use-gps-watch.ts`, `use-tracker.ts`, their
+  tests and a fake geolocation helper in `hooks/tests/`.
+- **Why:** The pure logic had no caller. A callback (not returned state) carries
+  each position so none are lost when two arrive together; the watch stops on
+  pause so the GPS is not running for nothing.
+- **Noted, not changed:** the fixes live in hook state beside the reducer, which
+  keeps two sources of truth in step by hand; folding them into the reducer was
+  discussed and left for later. `onFix` must be referentially stable. `error`
+  stays set after a pause until a good position arrives (the owner's flow is:
+  ask on the first run, keep timing when denied, add a manual distance and an
+  "enable GPS" button later).
+
+## 25. Run tracker screen at `/run` (branch `feat/run-tracker`)
+
+- **What:** The tracker on screen.
+  - `TrackerStatus`: a live-region word ("Ready", "Running", "Paused", "Run
+    finished") with a decorative mark.
+  - `TrackerStats`: time as the loudest numeral, distance in gold with km ticks.
+    The time has no spoken label so screen readers are not read a new time every
+    second.
+  - `TrackerControls`: Start, Pause and Resume as one persistent button (so
+    keyboard focus survives Pause to Resume), Stop with an "End this run?"
+    confirmation (focus on "Keep going", Escape cancels), and New run when
+    finished (focus moves to it).
+  - `Tracker` composes them with `useTracker`; `app/(app)/run/page.tsx` renders
+    it. The hook's `error` is not shown, by the owner's decision.
+- **Where:** `src/features/runs/components/Tracker*.tsx` and `.css` with tests in
+  `components/tests/`, `src/features/runs/index.ts`, `src/app/(app)/run/page.tsx`,
+  `README.md`, `AGENTS.md`, `docs/ARCHITECTURE.md`, `docs/DESIGN.md`.
+- **Why:** The owner wanted a tracker UI in the project's game-HUD style. Stop
+  asks first because a mis-tap would end the run with no undo; the safe choice is
+  the loud button. The finished state offers New run so the page is not a dead
+  end until the save form exists.
+- **Verified:** `npm run build`, `npm run lint` and `npm test` (287 pass); the
+  production build in Chrome with a simulated location moving about 1.1 km;
+  screenshots at 360px and 1280px; an axe audit with no violations in the ready,
+  running, confirm and finished states; focus checked by script at each step.
+- **Noted, not changed:** nothing is saved, and there is no nav link to `/run`.
+  Not tried with a screen reader, a real permission prompt or an outdoor run.
+  Numerals do not dim while paused. The GPS thresholds are still guesses.

@@ -128,6 +128,8 @@ seconds. Pace is never stored; it is derived from the two.
 | `HomePage` (`app/(marketing)/page.tsx`) | `<Landing />` | Static. The `<h1>` is the hero headline, so the header has none |
 | `AppLayout` (`app/(app)/layout.tsx`) | `<header>` with the wordmark as the `<h1>`, `<main id="main">` | Same `main` focus rule |
 | `FeedPage` (`app/(app)/feed/page.tsx`) | `<Feed />` | No data passed; the feed fetches its own |
+| `RunPage` (`app/(app)/run/page.tsx`) | `<Tracker />` | Static; the tracker is a client component |
+| `Tracker`, `TrackerStatus`, `TrackerStats`, `TrackerControls` | See "Run tracker" above | The tracker screen at `/run` |
 | `Landing` | Hero, `AnnotatedRun`, `Accessible`, `Closing` sections | Each section is a `<section>` named by its `<h2>`. The hero artwork is `aria-hidden`; the example run is labelled as not live data |
 | `Feed` | `<section>` labelled by an `<h2>` with `aria-busy`, a `<ul>` of cards | Client component. States: loading (skeletons, hidden "Loading runs" status), error (`role="alert"` and a "Try again" button), empty (`<output>`), ready, plus a "Load more runs" button |
 | `FeedCard` | One `<article>` labelled by its `<h3>` title | Header (avatar, name, username, date, location), notes, stats `<dl>` |
@@ -170,11 +172,12 @@ Take `unknown`, narrow with the existing guards (`toSeconds`, `toKm`,
 `toPaceSec`, `toDate`) or add a new guard, return a fallback on failure, and
 add a spoken counterpart if the value appears in the UI.
 
-## Run tracker (`lib/geo.ts`, `lib/tracker.ts`)
+## Run tracker (`lib/geo.ts`, `lib/tracker.ts`, hooks, components)
 
-Pure logic for recording a run in the browser. Nothing here uses React or
-browser APIs, so it can move into a mobile wrapper unchanged. Nothing calls it
-yet; the hook that feeds it GPS positions is the next step.
+Recording a run in the browser, in three layers. The logic modules in `lib/`
+use no React or browser APIs, so they can move into a mobile wrapper
+unchanged. Two hooks connect them to the browser. Four components show the
+result at `/run`. Nothing is saved yet.
 
 - `distanceKm(a, b)` is the haversine distance between two points.
 - `totalDistanceKm(fixes)` sums the hops along a list of fixes
@@ -198,6 +201,48 @@ yet; the hook that feeds it GPS positions is the next step.
   `durationSec`.
 - A device clock moved backwards mid-run counts as a zero-length span, so the
   duration is never negative.
+
+### Hooks
+
+- `useGpsWatch(active, onFix)` (`hooks/use-gps-watch.ts`) wraps
+  `navigator.geolocation.watchPosition` with high accuracy and no cached
+  positions. While `active` is true it passes each position through `toFix` and
+  calls `onFix` with the valid ones; it stops the watch when `active` turns
+  false or on unmount. It returns `{ error }`: `'unsupported'`, `'denied'` or
+  `'unavailable'`. `onFix` is a callback, not returned state, so two positions
+  arriving in one render are never merged into one. `onFix` must keep the same
+  identity between renders, or the effect restarts the watch every render.
+- `useTracker()` (`hooks/use-tracker.ts`) combines `trackerReducer`, a list of
+  fix *segments* (a new one on every start and resume, so travel while paused is
+  never measured), a one-second `now` tick and `useGpsWatch`. It returns
+  `{ status, startedAt, distanceKm, durationSec, error, start, pause, resume,
+  stop, reset }`. Elapsed time comes from clock differences, not from counting
+  ticks, so a throttled background tab does not drift.
+- Time lives in the reducer and the fixes live in separate state; the hook keeps
+  them in step (its `start` and `resume` check the status). Moving the fixes
+  into the reducer as a `fix` event would give one source of truth; not done.
+- `error` is kept until a good position arrives. A pause or resume does not
+  clear it, and a resume calls `watchPosition` again.
+
+### Components
+
+Each is a function of plain props except `Tracker`, which owns the hook.
+
+- `TrackerStatus` renders an `<output>` (a live region) saying "Ready",
+  "Running", "Paused" or "Run finished", with an `aria-hidden` square mark.
+- `TrackerStats` renders time and distance in a `<dl>`, with one km tick per
+  whole kilometre as in the feed card. The time has no spoken label because it
+  changes every second; the clock is not inside a live region.
+- `TrackerControls` renders the buttons for the status: Start; Pause or Resume
+  with Stop; New run when finished. The first button is the same element in
+  every state and only changes its label, so keyboard focus survives Pause to
+  Resume. Stop asks "End this run?" in a `<fieldset>` first: "Keep going" gets
+  focus (so a reflex Enter cancels) and Escape cancels, returning focus to
+  Stop. When the run finishes, focus moves to New run. The clock keeps running
+  while the question is open.
+- `Tracker` (`components/Tracker.tsx`) calls `useTracker` and lays out the
+  three, under an `<h2>`. It does not show the hook's `error`: a denied
+  location leaves the distance at zero while the time keeps counting.
 
 ## Styling
 

@@ -19,7 +19,8 @@ rather than fail.
 |---|---|
 | Landing page | Available at `/` |
 | Run feed with run cards | Available at `/feed`, loaded from the runs API |
-| Logging a new run | Planned |
+| Run tracker (stopwatch and GPS distance) | Available at `/run`; runs are not saved yet |
+| Saving a tracked run | Planned |
 | Runs API (list, read, create) | Available, stored in Supabase |
 | Authentication | Not started (new runs belong to the `abel` profile) |
 
@@ -28,6 +29,8 @@ rather than fail.
 - Landing page with an illustrated hero, an annotated example run and the
   accessibility story
 - Feed of runs with user details, location, notes and run statistics
+- Run tracker: Start, Pause, Resume and Stop (with a confirmation), live time
+  and GPS distance
 - Pace calculated from distance and time
 - Screen-reader-friendly output, such as "5 minutes 24 seconds per kilometer"
   in place of `5:24 /km`
@@ -61,8 +64,8 @@ The dev server prints the local URL.
 
 ```
 src/
-  app/               root layout, the landing (`/`) and feed (`/feed`) routes,
-                     global CSS
+  app/               root layout, the landing (`/`), feed (`/feed`) and
+                     tracker (`/run`) routes, global CSS
   features/landing/  the landing page: sections and the hero artwork
   features/runs/     the runs feature: components, formatting helpers, types
                      and server code (API handlers, validation, store)
