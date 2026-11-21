@@ -1,0 +1,50 @@
+.tracker-controls {
+  display: grid;
+  gap: var(--space-4);
+}
+
+/* Square, tall targets for a thumb on the move. Radius 0, no clipped corner:
+   clip-path would cut the focus ring. */
+.tracker-controls button {
+  min-height: calc(var(--space-8) + var(--space-6));
+  padding: var(--space-3) var(--space-8);
+  font: inherit;
+  font-size: var(--text-lg);
+  font-weight: 800;
+  border: 2px solid var(--color-accent);
+  border-radius: 0;
+  cursor: pointer;
+}
+
+.tracker-controls__primary {
+  color: var(--color-bg);
+  background: var(--color-accent);
+}
+
+.tracker-controls__primary:hover {
+  color: var(--color-accent);
+  background: transparent;
+}
+
+/* Stop ends the run for good, so it is quieter than the primary action. It is
+   not red: red means an error here. */
+.tracker-controls__stop {
+  color: var(--color-accent);
+  background: transparent;
+}
+
+.tracker-controls__stop:hover {
+  color: var(--color-bg);
+  background: var(--color-accent);
+}
+
+@media (min-width: 40rem) {
+  .tracker-controls {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  /* Idle has only Start; it takes the whole row. */
+  .tracker-controls__primary:only-child {
+    grid-column: 1 / -1;
+  }
+}
