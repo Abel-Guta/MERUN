@@ -1,7 +1,7 @@
+/* Glance layout: the time is the loudest thing, the distance the second voice. */
 .tracker-stats {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: var(--space-3) var(--space-4);
+  gap: var(--space-6);
   margin: 0;
 }
 
@@ -11,7 +11,47 @@
 }
 
 .tracker-stats dd {
-  margin: var(--space-1) 0 0;
-  font-size: var(--text-md);
-  font-weight: 700;
+  margin: 0;
+  font-stretch: 70%;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.tracker-stats__time dd {
+  margin-top: var(--space-1);
+  font-size: 4.5rem;
+}
+
+.tracker-stats__distance dd {
+  margin-top: var(--space-2);
+  color: var(--color-accent);
+  font-size: var(--text-3xl);
+}
+
+/* Same ticks as the feed card: one per whole kilometre, up to ten. */
+.tracker-stats__ticks {
+  display: flex;
+  gap: var(--space-1);
+  margin-top: var(--space-3);
+}
+
+.tracker-stats__tick {
+  width: var(--space-2);
+  height: var(--space-4);
+  background: var(--color-border);
+}
+
+.tracker-stats__tick--on {
+  background: var(--color-accent);
+}
+
+/* Forced colors drops backgrounds, so unlit and lit ticks need an outline. */
+@media (forced-colors: active) {
+  .tracker-stats__tick {
+    border: 1px solid CanvasText;
+  }
+
+  .tracker-stats__tick--on {
+    background: Highlight;
+  }
 }
