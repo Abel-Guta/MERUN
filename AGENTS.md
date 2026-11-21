@@ -5,12 +5,13 @@ follow the links for detail.
 
 ## Project
 
-MERUN is a run-logging MVP. Current scope: a landing page at `/` and a feed of
-run cards (who ran, what they ran) at `/feed`. The feed fetches runs from the
+MERUN is a run-logging MVP. Current scope: a landing page at `/`, a feed of
+run cards (who ran, what they ran) at `/feed`, and a run tracker at `/run`
+(stopwatch and GPS distance; a tracked run is not saved yet). The feed fetches runs from the
 runs API under `/api` in the browser. Runs are stored in Supabase (Postgres), reached only from the server
 through the secret key: list (feed, cursor pagination, per-user filter), get,
 create and the user lookup. The client does not call get or create yet. There
-are two pages, the landing page and the feed, and no auth; `createRun` attributes every new run to the `abel`
+are three pages, the landing page, the feed and the tracker, and no auth; `createRun` attributes every new run to the `abel`
 profile through a temporary mock (`currentProfileId` in `store.ts`) that is
 deleted once OAuth exists and the profile id comes from the session.
 
@@ -46,7 +47,8 @@ src/
     (marketing)/             route group for `/`: layout (site bar, <main>, footer)
                              and page.tsx rendering <Landing>
     (app)/                   route group for the app: layout (header, <main>) and
-                             feed/page.tsx rendering <Feed> at `/feed`
+                             feed/page.tsx rendering <Feed> at `/feed`,
+                             run/page.tsx rendering <Tracker> at `/run`
     globals.css              global styles, CSS variables, utilities
     api/                     one-line route files that re-export feature handlers
   features/
@@ -56,11 +58,16 @@ src/
       lib/hero-art.ts        the hero artwork as data (ridges, route, km marks)
     runs/                    one folder per feature
       index.ts               public, client-safe surface
-      components/            Feed, FeedCard (each with a co-located .css file)
-      hooks/                 React hooks (useRuns: client-side fetching state)
+      components/            Feed, FeedCard, Tracker, TrackerStatus, TrackerStats,
+                             TrackerControls (each with a co-located .css file)
+      hooks/                 React hooks (useRuns: client-side fetching state;
+                             useGpsWatch, useTracker: the run tracker)
       lib/                   plain helpers, no React, no server APIs
         format.ts            formatting helpers (visual + screen-reader text)
         api.ts, parse.ts     fetch the runs API, validate its response
+        geo.ts               GPS distance: haversine and noise filtering
+        position.ts          boundary: validate a browser GPS position into a Fix
+        tracker.ts           run stopwatch as a state machine (reducer)
       types.ts               User and Run types
       server/                server-only code
         index.ts             public server surface (route handlers)
@@ -98,10 +105,15 @@ These are decisions the owner has made. Do not reverse them without asking.
    where HTML falls short, labels on every control. Details in
    [docs/ACCESSIBILITY.md](docs/ACCESSIBILITY.md). `jsx-a11y` lint rules are on
    and must stay clean.
-2. **Functions do not trust their input.** Validating before the call is
-   planned, but every function must still behave correctly when handed bad
-   data: no throws on garbage, no `NaN`/`Infinity`/`Invalid Date` in output.
-   Take `unknown` at boundaries and narrow it. See `src/features/runs/lib/format.ts`.
+2. **Be defensive at boundaries, not everywhere.** A function that receives
+   data from outside the app (API request bodies and responses, browser
+   callbacks such as GPS positions, anything parsed from text) cannot know
+   whether it is valid. It takes `unknown`, narrows it, and must not throw or
+   output `NaN`/`Infinity`/`Invalid Date` on garbage. A function that is only
+   called with values our own typed code produced uses plain types and adds no
+   defensive checks. Before adding a guard, ask whether the data can really
+   come from outside. See `src/features/runs/lib/format.ts` for the boundary
+   style.
 3. **Plain CSS, co-located.** One `.css` file per component, imported by that
    component. Colors come from the CSS variables in `src/app/globals.css`. Do not add
    a CSS framework or UI library without asking.
@@ -177,8 +189,26 @@ Tracked here so nobody has to rediscover them.
   loading, error and load-more states have not been tested with a screen
   reader.
 - User avatars load from a remote host (`i.pravatar.cc`).
-- Next planned feature: a form to log a new run (see accessibility notes for
-  forms).
+- The tracker at `/run` works on screen but nothing is saved. Next planned
+  feature: a save form prefilled from the tracker (distance, duration and date
+  from the device) where the user types the title, location name and notes (see
+  the accessibility notes for forms), and the API call. Also not built: a manual
+  distance field for when location is denied (the owner's decision: the time
+  keeps counting, no error is shown, and a later "enable GPS" button asks again),
+  persistence (a reload or a discarded mobile tab loses the run), the Screen
+  Wake Lock, a nav link to `/run`, and dimming the numerals while paused. A web
+  page only gets GPS while it is open with the screen on; background tracking
+  would need a mobile wrapper.
+- Tracker tests cover `useGpsWatch`, `useTracker` (with a fake geolocation in
+  `hooks/tests/`), each tracker component and the composed `Tracker`. The
+  `/run` page was checked in Chrome with an axe audit (no violations in the
+  ready, running, confirm and finished states) and by watching focus move, but
+  not with a screen reader, a real permission prompt or a real outdoor run.
+  The GPS thresholds in `lib/geo.ts` are still guesses.
+- The tracker keeps time in the reducer and GPS fixes in separate hook state,
+  and `useGpsWatch` needs a stable `onFix`; both are explained in
+  `docs/ARCHITECTURE.md`. The hook's `error` stays set after a pause until a
+  good position arrives; that was left as is until the Start screen needs it.
 
 <!-- BEGIN:nextjs-agent-rules -->
 

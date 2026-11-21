@@ -5,8 +5,8 @@ Read it before changing the look of anything. Append to it after every design
 pass. Project rules (accessibility, plain co-located CSS, no UI library) live in
 [AGENTS.md](../AGENTS.md) and win over anything here.
 
-Status: built. The landing page (`/`) and the feed (`/feed`) share the system
-below.
+Status: built. The landing page (`/`), the feed (`/feed`) and the run tracker
+(`/run`) share the system below.
 
 ## Brief
 
@@ -86,6 +86,16 @@ one tick per whole kilometre (capped at ten) beneath it.
   only boundary.
 - **Errors:** red text on a panel with a red left edge.
 - **Skeleton:** same shape as a card, so the feed does not jump.
+- **Tracker panel:** the mission card's shape (surface, gold 4px left edge,
+  clipped top-right corner). Inside, top to bottom: a status word with a square
+  mark, the time as the loudest numeral (4.5rem, width 70%, text colour), the
+  distance a step down in gold with the feed card's km ticks, then the buttons
+  at the bottom where a thumb is. The buttons stay out of the clipped corner.
+- **Tracker buttons:** square, 56px tall, full width on a phone and side by side
+  from 40rem. The primary action (Start, Pause, Resume, New run) is solid gold;
+  Stop is gold-outlined. Stop is not red: red means an error here, and ending a
+  run is not one. Stop asks "End this run?" first, with "Keep going" as the
+  solid gold button (the safe choice is the loud one) and "End run" outlined.
 - **Annotated run:** the example card with leader lines to notes laid out down
   its height, in the order they appear on the card.
 
@@ -114,6 +124,12 @@ one tick per whole kilometre (capped at ten) beneath it.
 - **Centred hero, three icon cards, a phone mockup, hero stat blocks:** generic
   marketing templates.
 - **Photographs:** none were available; the art is generated SVG.
+- **A circular progress dial for the tracker:** a ring needs a goal such as 5 km,
+  and there is none, so it would be decoration that encodes nothing.
+- **A red Stop button, and a green Start:** the generic fitness-timer look, and
+  it would spend the error colour on a normal action.
+- **A modal dialog for the Stop confirmation:** an inline question keeps the
+  thumb in place and is simpler to make accessible and to test.
 
 ## Sameness test
 
@@ -145,3 +161,10 @@ spoken-number story as its feature. Passed.
   scale. Fixed along the way: a seam where the hero met the page, notes that
   did not point at the card, squashed labels, a header rule wider than the
   content.
+- **Run tracker screen:** `/run` with a status line, time and distance stats,
+  Start, Pause, Resume and Stop buttons, and a confirmation before stopping. It
+  reuses the existing tokens, numeral style and km ticks, with no new colours.
+  Checked with screenshots at 360px and 1280px and an axe audit (no violations in
+  the ready, running, confirm and finished states). Not built: dimming the
+  numerals while paused, the manual distance field and the save form. A
+  screen reader has not been used on it.
